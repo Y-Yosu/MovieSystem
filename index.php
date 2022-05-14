@@ -1,28 +1,32 @@
 <?php
-    
     require_once 'connect.php';
     session_start();
 
     $error = "";
     
     if(isset($_POST['submit'])) {
-        $name = $str = ucfirst(strtolower($_POST['sname']));
-        $password = $_POST['sid'];
-        $surname = "Polo";
-        $mail = "marcopolo@gmail.com";
-        $wallet = "100$";
-
-        $query = "SELECT sname, sid FROM student WHERE sname = '$name' and sid = '$password'";
+        $mail = $str = strtolower($_POST['smail']);
+        $password = $_POST['spassword'];
+        
+        $query = "SELECT user_name, user_surname, user_id FROM user WHERE user_mail = '$mail' and user_password = '$password'";
         $result = mysqli_query($con, $query);
+
         if($result == true) 
             $count = mysqli_num_rows($result);
         if($result == true && $count == 1){
             $error = "";
-            $_SESSION['sname'] = $name;
-            $_SESSION['surname'] = $surname;
-            $_SESSION['sid'] = $password;
+            $row = mysqli_fetch_array($result);
+            $_SESSION['sname'] = $str1 = ucfirst(strtolower($row[0]));
+            $_SESSION['surname'] = $str2 = ucfirst(strtolower($row[1]));
+            $_SESSION['sid'] = $row[2];
             $_SESSION['mail'] = $mail;
-            $_SESSION['wallet'] = $wallet;
+            $sid = $_SESSION["sid"];
+
+            $query2 = "SELECT C1.balance FROM card as C1, customer as C2, has as C3 WHERE C1.card_id = C3.card_id AND C2.user_id = '$sid' AND C3.user_id = C2.user_id;";
+            $result2 = mysqli_query($con, $query2);
+            $row2 = mysqli_fetch_array($result2);
+
+            $_SESSION['wallet'] = strval($row2[0]) . "$";
             header("Location: home.php"); 
         }
         else{
@@ -67,8 +71,8 @@
         <h2>Login Page</h2>
         <p class="error" style="color: red;" ><?php echo $error; ?></p>
         <form method="post" style="text-align: center;">
-            Email <input name="sname" type="text" required style="margin-top: 10px; margin-left: 26px"><br>
-            Password <input name="sid" type="numerical" required style="margin-top: 15px;"><br>
+            Email <input name="smail" type="text" required style="margin-top: 10px; margin-left: 26px"><br>
+            Password <input name="spassword" type="numerical" required style="margin-top: 15px;"><br>
             <button name="submit" type="submit" style="margin-top: 15px;">Login</button>  
         </form>
         <form method="post" style="text-align: center;"><button type="submit" name="forget" class="applyButton" style="margin-right: 155px;">Forgot my password</button><br>

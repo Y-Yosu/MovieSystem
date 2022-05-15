@@ -7,7 +7,7 @@
     $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
     $qres = mysqli_query($con,$query);
     //echo "Query: $query\n";
-    //echo "Qres: $qres\n";
+    
     if($qres == true) 
         $count = mysqli_num_rows($qres);
     if($qres == true && $count != 0){
@@ -86,7 +86,7 @@
             $query = $query . "NULL";
         else
             $query = $query . "'$maxr'";
-        $query = $query . " IS NULL) OR (F.f_rating < '$maxr') ) ";
+        $query = $query . " IS NULL) OR (F.f_rating < '$maxr') ) ORDER BY R.rent_date";
 
         //echo " kk: $query !";
 

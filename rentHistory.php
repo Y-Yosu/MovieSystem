@@ -3,6 +3,18 @@
     session_start();
     $error = "";
     $admin = "admin";
+    
+    $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
+    $qres = mysqli_query($con,$query);
+    
+    if($qres == true) 
+        $count = mysqli_num_rows($qres);
+    if($qres == true && $count != 0){
+        $error = "";
+    }
+    else{
+        $error = "No results from server"; 
+    }
 
     if(isset($_POST['home'])) {
         header("Location: home.php");
@@ -21,6 +33,71 @@
     }
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
+    }
+    if(isset($_POST['moviePage'])) {
+        $_SESSION['goToMovie'] = $_POST['moviePage'];
+        header("Location: moviePage.php");
+    }
+    if(isset($_POST['search'])) {
+        
+        $f_title = $_POST['title'];
+        $f_director = $_POST['director'];
+        $f_year = $_POST['year'];
+        $f_genre = $_POST['genre'];
+        $minr = $_POST['minr'];
+        $maxr = $_POST['maxr'];
+        
+        $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id ".
+                        "FROM film as F, rent as R ".
+                        "WHERE R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id AND ( ( ";
+
+        if( $f_title == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_title'";
+        $query = $query . " IS NULL) OR (F.f_title = '$f_title') ) AND ( ( ";
+        
+        if( $f_director == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_director'";
+        $query = $query . " IS NULL) OR (F.f_director = '$f_director') ) AND ( ( ";
+        
+        if( $f_year == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_year'";
+        $query = $query . " IS NULL) OR (F.f_year = '$f_year') ) AND ( ( ";
+        
+        if( $f_genre == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_genre'";
+        $query = $query . " IS NULL) OR (F.f_genre = '$f_genre') ) AND ( ( ";
+        
+        if( $minr == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$minr'";
+        $query = $query . " IS NULL) OR (F.f_rating > '$minr') ) AND ( ( ";
+        
+        if( $maxr == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$maxr'";
+        $query = $query . " IS NULL) OR (F.f_rating < '$maxr') ) ORDER BY R.rent_date";
+
+        //echo " kk: $query !";
+
+        $qres = mysqli_query($con,$query);
+        if($qres == true) 
+            $count = mysqli_num_rows($qres);
+        if($qres == true && $count != 0){
+            $error = "";
+        }
+        else{
+            $error = "No results from query"; 
+        }
     }
     
 ?>
@@ -156,10 +233,26 @@
                                         <th>Rate</th>
                                         <th>Rent Date</th>
                                     </tr> ";
-                                    echo "<tr><td>" . "The Ring" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Romance" . "</td><td>" . "1927" . "</td><td>" . "7.3" . "</td><td>" . "08.03.2020" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                                    if($qres == true){
+                                        while( $row = mysqli_fetch_array($qres)){
+                                            echo "<tr>";
+                                            echo "<td>" . $row['f_title'] . "</td>";
+                                            echo "<td>" . $row['f_director'] . "</td>";
+                                            echo "<td>" . $row['f_genre'] . "</td>";
+                                            echo "<td>" . $row['f_year'] . "</td>";
+                                            echo "<td>" . $row['f_rating'] . "</td>";
+                                            echo "<td>" . $row['rent_date'] . "</td>";
+                                            echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
+                                            echo "</tr>";
+                                        }
+                                        echo "</table>";
+                                    }
+                        }
+                        else if($error == "No results from query"){
+                            echo "<p style=\"text-align: left; color: red;\">There are no rented films with such criteria...</p>";
                         }
                         else {
-                            echo "<p style=\"text-align: left; color: red;\">There are currently no rented films...</p>";
+                            echo "<p style=\"text-align: left; color: red;\">No films found in history...</p>";
                         }
                     ?>
                 </table>

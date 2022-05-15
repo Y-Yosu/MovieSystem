@@ -1,8 +1,26 @@
 <?php
+    require_once 'connect.php';
     session_start();
     $error = "found";
     $admin = "admin";
 
+    $query = "SELECT C2.user_id, C2.user_name, C2.user_surname, C2.user_mail FROM add_friend as C1, user as C2 WHERE C1.added_id = '".$_SESSION["sid"]."' AND C1.adder_id = C2.user_id AND request_status = 'Pending'";
+    $result = mysqli_query($con, $query);
+
+    if(isset($_POST['search'])) {
+        $name = $_POST['name'];
+        $surname = $_POST['surname'];
+        $mail = $_POST['email'];
+
+        $query = "SELECT C2.user_id, C2.user_name, C2.user_surname, C2.user_mail FROM add_friend as C1, user as C2 WHERE (C1.added_id = '".$_SESSION["sid"]."' AND C1.adder_id = C2.user_id AND request_status = 'Pending') AND ( ( ";
+        if($name == "") $query = $query . "NULL"; else $query = $query . "'$name'"; 
+        $query = $query . " IS NULL) OR (C2.user_name = '$name') ) AND ( ( ";
+        if($surname == "") $query = $query . "NULL"; else $query = $query . "'$surname'"; 
+        $query = $query . " IS NULL) OR (C2.user_surname = '$surname') ) AND ( ( ";
+        if($mail == "") $query = $query . "NULL"; else $query = $query . "'$mail'"; 
+        $query = $query . " IS NULL) OR (C2.user_mail = '$mail') )";
+        $result = mysqli_query($con, $query);
+    }
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }
@@ -23,6 +41,22 @@
     }
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
+    }
+    if(isset($_POST['Accept'])) {
+        $query2 = "UPDATE add_friend, user SET add_friend.request_status = 'Accepted' WHERE add_friend.added_id = '".$_SESSION["sid"]."' AND add_friend.adder_id = '".$_POST['Accept']."'";
+        $result2 = mysqli_query($con, $query2);
+
+        $query = "SELECT C2.user_id, C2.user_name, C2.user_surname, C2.user_mail FROM add_friend as C1, user as C2 WHERE C1.added_id = '".$_SESSION["sid"]."' AND C1.adder_id = C2.user_id AND request_status = 'Pending'";
+        $result = mysqli_query($con, $query);
+        header("Location: friendRequests.php");
+    }
+    if(isset($_POST['Decline'])) {
+        $query2 = "DELETE FROM add_friend WHERE add_friend.added_id = '".$_SESSION["sid"]."' AND add_friend.adder_id = '".$_POST['Decline']."'";
+        $result2 = mysqli_query($con, $query2);
+
+        $query = "SELECT C2.user_id, C2.user_name, C2.user_surname, C2.user_mail FROM add_friend as C1, user as C2 WHERE C1.added_id = '".$_SESSION["sid"]."' AND C1.adder_id = C2.user_id AND request_status = 'Pending'";
+        $result = mysqli_query($con, $query);
+        header("Location: friendRequests.php");
     }
 
 ?>
@@ -153,7 +187,10 @@
                                         <th>Surname</th>
                                         <th>Email</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Emre" . "</td><td>" . "Aydogmus" . "</td><td>" . "emre.aydogmus@ug.bilkent.edu.tr" . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Accept Request</button></form></td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\" style=\"color: red;\">Decline Request</button></form></td></tr>";
+                            while($row = mysqli_fetch_array($result)) {
+                                echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname']  . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Accept\" class=\"rentButton\">Accept Request</button></form></td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Decline\" class=\"rentButton\" style=\"color: red;\">Decline Request</button></form></td></tr>";
+                            }        
+                            echo "</table>";        
                         }
                         else if ($error == "notFound") {
                             echo "<p style=\"text-align: left; color: red;\">No such user exsists...</p>";

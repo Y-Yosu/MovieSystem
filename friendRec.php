@@ -167,7 +167,7 @@
                             echo "</table>";
                         }
                         else {
-                            echo "<p style=\"text-align: left; color: red;\">No recomendations from Cagri</p>";
+                            echo "<p style=\"text-align: left; color: red;\">No recomendations from ".$row[0]." ".$row[1]."</p>";
                         }
                     ?>
             </div>

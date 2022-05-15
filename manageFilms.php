@@ -197,7 +197,7 @@
                                     else
                                         echo "<b>Comment: </b><p>".$row['request_desc']."</p><br>";
                                     echo "
-                                    <form method=\"post\"><button type=\"submit\" name=\"deleteRequest\" class=\"rentButton\" value = ".$row['af_id'].">Delete Request</button></form>
+                                    <form method=\"post\"><button type=\"submit\" name=\"deleteRequest\" class=\"rentButton\" value = ".$row['af_id'].">Discard Request</button></form>
                                     <hr style=\"width: 500px; text-align:left; margin-left:0\">";
                                     /*
                                     if( is_null( $row['f_rating'] ) )

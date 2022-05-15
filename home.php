@@ -15,6 +15,8 @@
         $error = "No results from server"; 
     }
 
+    //echo "----------MAIN PAGE QUERY: $query";
+
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }
@@ -41,16 +43,24 @@
         header("Location: moviePage.php");
     }
     if(isset($_POST['request'])) {
-        $f_title = $_POST['title'];
-        $f_director = $_POST['director'];
-        $f_year = $_POST['year'];
-        $f_genre = $_POST['genre'];/*
-        $query = "INSERT INTO request (user_id, af_id, request_status, request_desc) "
-				. "VALUES('".$_SESSION['sid']."', '+af_id+', '+request_status+', '+request_desc+' )";
+        $f_title = $_POST['title_r'];
+        $f_director = $_POST['director_r'];
+        $f_year = $_POST['year_r'];
+        $f_genre = $_POST['genre_r'];
+
+        $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'emre_aydogmus' AND TABLE_NAME = 'absent_film'";
         $qres = mysqli_query($con,$query);
-        $query = "INSERT INTO absent_film (af_id, af_title, af_director, af_year, af_genre) "
-        + "VALUES('"+af_id+"', '"+af_title+"', '"+af_director+"', '"+af_year+"', '"+af_genre+"' )";
-        $qres = mysqli_query($con,$query);*/
+        $row = mysqli_fetch_array($qres);
+        $next_id = $row['AUTO_INCREMENT'];
+        
+        $query = "INSERT INTO absent_film ( af_title, af_director, af_year, af_genre) "
+        . "VALUES( '$f_title', '$f_director', '$f_year', '$f_genre' )";
+        $qres = mysqli_query($con,$query);
+        $query = "INSERT INTO request ( user_id, af_id, request_status, request_desc) "
+				. "VALUES('".$_SESSION['sid']."', '$next_id', 'Pending', '".$_POST['comments_r']."' )";
+        echo "bozuk: $query";
+        $qres = mysqli_query($con,$query);
+        header("Location: home.php");
     }
     if(isset($_POST['search'])) {
         
@@ -270,8 +280,11 @@
                                     echo "<td>" . $row['f_director'] . "</td>";
                                     echo "<td>" . $row['f_genre'] . "</td>";
                                     echo "<td>" . $row['f_year'] . "</td>";
-                                    echo "<td>" . $row['f_rating'] . "</td>";
-                                    echo "<td>" . $row['f_price'] . "</td>";
+                                    if( is_null( $row['f_rating'] ) )
+                                        echo "<td>" . "-" . "</td>";
+                                    else
+                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                    echo "<td>" . $row['f_price'] . "$</td>";
                                     echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
                                     echo "</tr>";
                                 }
@@ -282,11 +295,11 @@
                             echo "<p style=\"text-align: left; color: red;\">No such film exsists...</p>";
                             echo "<p style=\"text-align: left;\">Can't find what you are looking for? Request a new film here:</p>
                             <form method=\"post\" class=\"example\">
-                                <input name=\"title\" type=\"text\" size=\"10\" placeholder = \"Title\" required>
-                                <input name=\"director\" type=\"numerical\" size=\"10\" placeholder = \"Director\" required>
-                                <input name=\"genre\" type=\"numerical\" size=\"5\" placeholder = \"Genre\" required>
-                                <input name=\"year\" type=\"numerical\" size=\"2\" placeholder = \"Year\" required><br>
-                                <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments\" id=\"comments\" placeholder=\"Additional Coments...\" style=\"width: 335px; resize: none;\"></textarea><br>
+                                <input name=\"title_r\" type=\"text\" size=\"10\" placeholder = \"Title\" required>
+                                <input name=\"director_r\" type=\"numerical\" size=\"10\" placeholder = \"Director\" required>
+                                <input name=\"genre_r\" type=\"numerical\" size=\"5\" placeholder = \"Genre\" required>
+                                <input name=\"year_r\" type=\"numerical\" size=\"2\" placeholder = \"Year\" required><br>
+                                <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments_r\" id=\"comments\" placeholder=\"Additional Coments...\" style=\"width: 335px; resize: none;\"></textarea><br>
                                 <button name=\"request\" type=\"submit\"> Make Request</button>  
                             </form>";
                         }

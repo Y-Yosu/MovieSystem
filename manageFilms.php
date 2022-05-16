@@ -143,8 +143,9 @@
                     <input name="genre" type="numerical" size="5" placeholder = "Genre">
                     <input name="year" type="numerical" size="2" placeholder = "Year">
                     <input name="cost" type="numerical" size="1" placeholder = "Cost">
-                    <input name="series" type="text" size="10" placeholder = "Series"><br>
-                    <textarea wrap="off" cols="30" rows="5" name="comments" id="comments" placeholder="Description" style="width: 495px; resize: none;"></textarea><br>
+                    <input name="series" type="text" size="10" placeholder = "Series">
+                    <input name="series" type="text" size="1" placeholder = "S-No"><br>
+                    <textarea wrap="off" cols="30" rows="5" name="comments" id="comments" placeholder="Description" style="width: 542px; resize: none;"></textarea><br>
                     <button name="search" type="submit" style="width:  75px">Add</button>  
                 </form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 

@@ -25,6 +25,10 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['moviePage'])) {
+        $_SESSION['goToMovie'] = $_POST['moviePage']; 
+        header("Location: moviePage.php");
+    }
 ?>
 
 <!DOCTYPE html>
@@ -138,7 +142,12 @@
             <div style="padding:0 10px;">
                 <h3 style="text-align: left;">Recomended Films from Friends:</h3>
                     <?php
-                        if($error == "") {
+                        $query = "SELECT C1.f_id, C1.f_title, C1.f_director, C1.f_genre, C1.f_year, C1.f_rating, C1.f_price FROM film as C1, recommend as C2 WHERE C2.receiver_id = '".$_SESSION["sid"]."' AND C1.f_id = C2.f_id";
+                        
+                        $result = mysqli_query($con, $query);
+                        if($result == true) 
+                            $count = mysqli_num_rows($result);
+                        if($result == true && $count != 0) {
                             echo "
                                 <table>
                                     <tr>
@@ -149,8 +158,11 @@
                                         <th>Rate</th>
                                         <th>Cost</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Psycho" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Horror" . "</td><td>" . "1998" . "</td><td>" . "8.2" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "The Mountain Eagle" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Dram" . "</td><td>" . "1926" . "</td><td>" . "7.4" . "</td><td>" . "40$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr></table>";
+                            while($row = mysqli_fetch_array($result)) {
+                                        echo "<tr><td>" . $row['f_title'] . "</td><td>" . $row['f_director'] . "</td><td>" . $row['f_genre'] . "</td><td>" . $row['f_year'] . "</td><td>" . $row['f_rating'] . "</td><td>" . $row['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                            }        
+                            
+                            echo "</table>";
                         }
                         else {
                             echo "<p style=\"text-align: left; color: red;\">No recomendations from friends</p>";;

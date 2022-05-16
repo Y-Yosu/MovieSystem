@@ -15,6 +15,11 @@
         $error = "No results from server"; 
     }
 
+    $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    $wallet = $row[6];
+
     //echo "----------MAIN PAGE QUERY: $query";
 
     if(isset($_POST['home'])) {
@@ -234,7 +239,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <p>Wallet: <?php echo $_SESSION['wallet'];?></p>
+            <p>Wallet: <?php echo $wallet;?></p>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>

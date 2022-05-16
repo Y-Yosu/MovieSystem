@@ -3,7 +3,10 @@
     session_start();
     $error = "";
     $admin = "admin";
-
+    $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    $wallet = $row[6];
     $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
     $qres = mysqli_query($con,$query);
     //echo "Query: $query\n";
@@ -197,7 +200,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <p>Wallet: <?php echo $_SESSION['wallet'];?></p>
+            <p>Wallet: <?php echo $wallet;?></p>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>

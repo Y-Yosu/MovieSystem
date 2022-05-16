@@ -20,7 +20,6 @@
             $_SESSION['surname'] = $str2 = ucfirst(strtolower($row[1]));
             $_SESSION['sid'] = $row[2];
             $_SESSION['mail'] = $mail;
-            $_SESSION['wallet'] = "100$";
             header("Location: home.php"); 
         }
         else{

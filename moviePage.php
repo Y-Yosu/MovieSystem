@@ -15,15 +15,16 @@
     if(array_key_exists("goToMovie", $_POST))
         $_SESSION['goToMovie'] = $_POST["goToMovie"];
     $movieId = $_SESSION['goToMovie'];
-
-    $query = "select * from film where f_id = '$movieId';";
-    $result = $con->query($query);
-    $row = $result->fetch_array(MYSQLI_NUM);
     
     $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
     $result = $con->query($query);
     $row = $result->fetch_array(MYSQLI_NUM);
     $wallet = $row[6];
+    
+    $query = "select * from film where f_id = '$movieId';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    
     
     $error = "";
     $admin = "admin";

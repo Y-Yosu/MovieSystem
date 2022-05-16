@@ -47,10 +47,18 @@
         . "VALUES( '".$_POST['title']."', '".$_POST['director']."', '".$_POST['year']."', NULL, '".$_POST['genre']."', '".$_POST['cost']."', '".$_POST['description']."' )";
         $qres2 = mysqli_query($con,$query2);
         
-        $query2 = "INSERT INTO part_of ( f_id, series_name, order_no ) "
-        . "VALUES( '".$next_id."', '".$_POST['series']."', NULL )";
-        $qres2 = mysqli_query($con,$query2);
-        header("Location: manageFilms.php");
+        if( !(is_null($_POST['series']) OR $_POST['series'] == "" ) ){
+            $test = $_POST['series'];
+            $query2 = "INSERT IGNORE INTO series ( series_name, series_desc ) "
+            . "VALUES( '".$_POST['series']."', NULL )";
+            $qres2 = mysqli_query($con,$query2);
+    
+            $query2 = "INSERT INTO part_of ( f_id, series_name, order_no ) "
+            . "VALUES( '".$next_id."', '".$_POST['series']."', '".$_POST['seriesno']."' )";
+            $qres2 = mysqli_query($con,$query2);
+        }
+
+        //header("Location: manageFilms.php");
     }
     if(isset($_POST['deleteRequest'])) {
 
@@ -177,8 +185,9 @@
                     <input name="genre" type="numerical" size="5" placeholder = "Genre" required>
                     <input name="year" type="numerical" size="2" placeholder = "Year" required>
                     <input name="cost" type="numerical" size="1" placeholder = "Cost" required>
-                    <input name="series" type="text" size="10" placeholder = "Series" required><br>
-                    <textarea wrap="off" cols="30" rows="5" name="description" id="description" placeholder="Description" style="width: 495px; resize: none;" required></textarea><br>
+                    <input name="series" type="text" size="10" placeholder = "Series">
+                    <input name="seriesno" type="text" size="1" placeholder = "S-No"><br>
+                    <textarea wrap="off" cols="30" rows="5" name="description" id="description" placeholder="Description" style="width: 542px; resize: none;"></textarea><br>
                     <button name="addFilm" type="submit" style="width:  75px">Add</button>  
                 </form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 

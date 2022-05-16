@@ -2,7 +2,6 @@
     require_once 'connect.php';
     session_start();
     $error = "";
-    $admin = "admin";
 
     $query = "SELECT user_name, user_surname FROM user WHERE user_id = '".$_SESSION["recomender_id"]."'";
     $result = mysqli_query($con, $query);
@@ -137,7 +136,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
             </div></form>
         </div>

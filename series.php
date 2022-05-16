@@ -10,7 +10,6 @@
     require_once 'connect.php';
     session_start();
     $error = "";
-    $admin = "admin";
     $query = "select * from series where series_name = '" . $_SESSION['series'] . "';";
     $result = $con->query($query);
     $row = $result->fetch_array(MYSQLI_NUM);
@@ -142,7 +141,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
             </div></form>
         </div>

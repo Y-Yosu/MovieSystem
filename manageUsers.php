@@ -4,13 +4,11 @@
     $error = "found";
     $admin = "admin";
 
-<<<<<<< HEAD
     $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
     $result = $con->query($query);
     $row = $result->fetch_array(MYSQLI_NUM);
     $wallet = $row[6];
 
-=======
     $query = "SELECT * FROM user as U, customer as C WHERE U.user_id <> '".$_SESSION['sid']."' AND C.user_id = U.user_id";
     $result = mysqli_query($con, $query);
     if(isset($_POST['search'])) {
@@ -27,7 +25,6 @@
         $query = $query . " IS NULL) OR (user_mail = '$mail') )";
         $result = mysqli_query($con, $query);
     }
->>>>>>> 7b7251ae5393ebcd71d55e3e0efa9240516faef8
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }

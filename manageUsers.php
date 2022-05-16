@@ -9,6 +9,22 @@
     $row = $result->fetch_array(MYSQLI_NUM);
     $wallet = $row[6];
 
+    $query = "SELECT * FROM user as U, customer as C WHERE U.user_id <> '".$_SESSION['sid']."' AND C.user_id = U.user_id";
+    $result = mysqli_query($con, $query);
+    if(isset($_POST['search'])) {
+        $name = $_POST['name'];
+        $surname = $_POST['surname'];
+        $mail = $_POST['email'];
+
+        $query = "SELECT * FROM user as U, customer as C WHERE (U.user_id <> '".$_SESSION['sid']."' AND C.user_id = U.user_id) AND ( ( ";
+        if($name == "") $query = $query . "NULL"; else $query = $query . "'$name'"; 
+        $query = $query . " IS NULL) OR (user_name = '$name') ) AND ( ( ";
+        if($surname == "") $query = $query . "NULL"; else $query = $query . "'$surname'"; 
+        $query = $query . " IS NULL) OR (user_surname = '$surname') ) AND ( ( ";
+        if($mail == "") $query = $query . "NULL"; else $query = $query . "'$mail'"; 
+        $query = $query . " IS NULL) OR (user_mail = '$mail') )";
+        $result = mysqli_query($con, $query);
+    }
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }
@@ -30,7 +46,12 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
-
+    if(isset($_POST['Delete'])) {
+        $query2 = "DELETE FROM user WHERE user_id = '".$_POST['Delete']."'";
+        $result2 = mysqli_query($con, $query2);
+ 
+        header("Location: manageUsers.php");
+    }
 ?>
 
 <!DOCTYPE html>
@@ -151,7 +172,9 @@
                     <button name="search" type="submit" style="width:  75px"><i class="fa fa-search"></i></button>  
                 </form>
                 <?php
-                        if($error == "found") {
+                        if($result == true) 
+                            $count = mysqli_num_rows($result);
+                        if($result == true && $count != 0) {
                             echo "<h3 style=\"text-align: left;\">Search Resault:</h3>
                                 <table>
                                     <tr>
@@ -159,9 +182,12 @@
                                         <th>Surname</th>
                                         <th>Email</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Yusuf" . "</td><td>" . "Uyar" . "</td><td>" . "Yusufuyar2000@gmail.com" . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Delete User</button></form></td></tr>";
+                            while($row = mysqli_fetch_array($result)) {
+                                echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname'] . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Delete\" class=\"rentButton\">Delete User</button></form></td></tr>";
+                            }        
+                            echo "</table>";
                         }
-                        else if ($error == "notFound") {
+                        else {
                             echo "<p style=\"text-align: left; color: red;\">No such user exsists...</p>";
                         }
                     ?> 

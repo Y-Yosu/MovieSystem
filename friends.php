@@ -30,7 +30,19 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
-
+    if(isset($_POST['add'])) {
+        header("Location: addFriend.php");
+    }
+    if(isset($_POST['recomendations'])) {
+        header("Location: recomendations.php");
+    }
+    if(isset($_POST['friendRequest'])) {
+        header("Location: friendRequests.php");
+    }
+    if(isset($_POST['Recomendation'])) {
+        $_SESSION['recomender_id'] = $_POST['Recomendation'];
+        header("Location: friendRec.php");
+    }
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +157,11 @@
             <div style="padding:0 10px;">
                 <h3 style="text-align: center;">Friends</h3>
                 <?php
-                        if($error == "") {
+                        $query = "SELECT C2.user_id, C2.user_name, C2.user_surname, C2.user_mail FROM add_friend as C1, user as C2 WHERE ( C1.adder_id = '".$_SESSION["sid"]."' OR C1.added_id = '".$_SESSION["sid"]."' ) AND request_status = \"Accepted\" AND ( C2.user_id = C1.adder_id OR C2.user_id = C1.added_id ) AND C2.user_id <> '".$_SESSION["sid"]."'";
+                        $result = mysqli_query($con, $query);
+                        if($result == true) 
+                            $count = mysqli_num_rows($result);
+                        if($result == true && $count != 0){
                             echo "
                             <table>
                                     <tr>
@@ -153,11 +169,13 @@
                                         <th>Surname</th>
                                         <th>Email</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Cagri" . "</td><td>" . "Durgut" . "</td><td>" . "cagri.durgut@ug.bilkent.edu.tr" . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Recomendations</button></form></td></tr>";
-                            echo "<tr><td>" . "Seckin" . "</td><td>" . "Satir" . "</td><td>" . "seckin.satir@ug.bilkent.edu.tr" . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Recomendations</button></form></td></tr>";
+
+                            while($row = mysqli_fetch_array($result)) {
+                                echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname'] . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Recomendation\" value=".$row['user_id']." class=\"rentButton\">Recomendations</button></form></td></tr>";
+                            }
                             echo "</table>";
                         }
-                        else if ($error == "noFriend") {
+                        else {
                             echo "<p style=\"text-align: left; color: red;\">Dont have any friends curently...</p>";
                         }
                     ?>

@@ -4,6 +4,10 @@
     $error = "";
     $admin = "admin";
 
+    $query = "SELECT user_name, user_surname FROM user WHERE user_id = '".$_SESSION["recomender_id"]."'";
+    $result = mysqli_query($con, $query);
+    $row = mysqli_fetch_array($result);
+
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }
@@ -24,6 +28,10 @@
     }
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
+    }
+    if(isset($_POST['moviePage'])) {
+        $_SESSION['goToMovie'] = $_POST['moviePage']; 
+        header("Location: moviePage.php");
     }
 ?>
 
@@ -136,9 +144,13 @@
 
         <div class="right" >
             <div style="padding:0 10px;">
-                <h3 style="text-align: left;">Recomended Films by Cagri Durgut:</h3>
+                <?php echo "<h3 style=\"text-align: left;\">Recomended Films by ".$row[0]." " .$row[1].":</h3>"; ?>
                     <?php
-                        if($error == "") {
+                        $query2 = "SELECT C1.f_id, C1.f_title, C1.f_director, C1.f_genre, C1.f_year, C1.f_rating, C1.f_price FROM film as C1, recommend as C2 WHERE C2.recommender_id = '".$_SESSION["recomender_id"]."' AND C2.receiver_id = '".$_SESSION["sid"]."' AND C1.f_id = C2.f_id";
+                        $result2 = mysqli_query($con, $query2);
+                        if($result2 == true) 
+                            $count2 = mysqli_num_rows($result2);    
+                        if($result2 == true && $count2 != 0) {
                             echo "
                                 <table>
                                     <tr>
@@ -149,10 +161,13 @@
                                         <th>Rate</th>
                                         <th>Cost</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Psycho" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Horror" . "</td><td>" . "1998" . "</td><td>" . "8.2" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr></table>";
+                            while($row2 = mysqli_fetch_array($result2)) {
+                                        echo "<tr><td>" . $row2['f_title'] . "</td><td>" . $row2['f_director'] . "</td><td>" . $row2['f_genre'] . "</td><td>" . $row2['f_year'] . "</td><td>" . $row2['f_rating'] . "</td><td>" . $row2['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row2['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                            }        
+                            echo "</table>";
                         }
                         else {
-                            echo "<p style=\"text-align: left; color: red;\">No recomendations from Cagri</p>";;
+                            echo "<p style=\"text-align: left; color: red;\">No recomendations from ".$row[0]." ".$row[1]."</p>";
                         }
                     ?>
             </div>

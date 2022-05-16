@@ -293,7 +293,7 @@
                     if($rentStatus == "Ongoing") echo "<p style=\"color: green;\">Already Rented</p>";
                     else echo "<form method=\"post\" style=\"display: inline;\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Rent for: $cost</button></form>" 
                 ?><br><br>
-                <form method="post" class="example"><button name="recomend" type="submit" style="width: 100px;" >Recommend</button></form>
+                <form method="post" action="recommend.php" class="example"><button name="recommend" type="submit" style="width: 100px;" >Recommend</button></form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 
                 <?php
                 if($userrated ) 

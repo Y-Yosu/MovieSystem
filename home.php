@@ -4,6 +4,19 @@
     $error = "";
     $admin = "admin";
 
+    $query = "SELECT f_title, f_director, f_year, f_rating, f_genre, f_price, f_id FROM film ";
+    $qres = mysqli_query($con,$query);
+    if($qres == true) 
+        $count = mysqli_num_rows($qres);
+    if($qres == true && $count != 0){
+        $error = "";
+    }
+    else{
+        $error = "No results from server"; 
+    }
+
+    //echo "----------MAIN PAGE QUERY: $query";
+
     if(isset($_POST['home'])) {
         header("Location: home.php");
     }
@@ -24,6 +37,105 @@
     }
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
+    }
+    if(isset($_POST['moviePage'])) {
+        $_SESSION['goToMovie'] = $_POST['moviePage'];
+        header("Location: moviePage.php");
+    }
+    if(isset($_POST['request'])) {
+        $f_title = $_POST['title_r'];
+        $f_director = $_POST['director_r'];
+        $f_year = $_POST['year_r'];
+        $f_genre = $_POST['genre_r'];
+
+        $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'emre_aydogmus' AND TABLE_NAME = 'absent_film'";
+        $qres = mysqli_query($con,$query);
+        $row = mysqli_fetch_array($qres);
+        $next_id = $row['AUTO_INCREMENT'];
+        
+        $query = "INSERT INTO absent_film ( af_title, af_director, af_year, af_genre) "
+        . "VALUES( '$f_title', '$f_director', '$f_year', '$f_genre' )";
+        $qres = mysqli_query($con,$query);
+        $query = "INSERT INTO request ( user_id, af_id, request_status, request_desc) "
+				. "VALUES('".$_SESSION['sid']."', '$next_id', 'Pending', '".$_POST['comments_r']."' )";
+        echo "bozuk: $query";
+        $qres = mysqli_query($con,$query);
+        header("Location: home.php");
+    }
+    if(isset($_POST['search'])) {
+        
+        $f_title = $_POST['title'];
+        $f_director = $_POST['director'];
+        $f_year = $_POST['year'];
+        $f_genre = $_POST['genre'];
+        $minr = $_POST['minr'];
+        $maxr = $_POST['maxr'];
+        $minp = $_POST['minC'];
+        $maxp = $_POST['maxC'];
+        
+        $query = "SELECT f_title, f_director, f_year, f_rating, f_genre, f_price, f_id ".
+                        "FROM film ".
+                        "WHERE ( ( ";
+        
+        if( $f_title == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_title'";
+        $query = $query . " IS NULL) OR (f_title = '$f_title') ) AND ( ( ";
+        
+        if( $f_director == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_director'";
+        $query = $query . " IS NULL) OR (f_director = '$f_director') ) AND ( ( ";
+        
+        if( $f_year == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_year'";
+        $query = $query . " IS NULL) OR (f_year = '$f_year') ) AND ( ( ";
+        
+        if( $f_genre == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$f_genre'";
+        $query = $query . " IS NULL) OR (f_genre = '$f_genre') ) AND ( ( ";
+        
+        if( $minr == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$minr'";
+        $query = $query . " IS NULL) OR (f_rating > '$minr') ) AND ( ( ";
+        
+        if( $maxr == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$maxr'";
+        $query = $query . " IS NULL) OR (f_rating < '$maxr') ) AND ( ( ";
+        
+        if( $minp == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$minp'";
+        $query = $query . " IS NULL) OR (f_price > '$minp') ) AND ( ( ";
+
+        if( $maxp == "" )
+            $query = $query . "NULL";
+        else
+            $query = $query . "'$maxp'";
+        $query = $query . " IS NULL) OR (f_price < '$maxp') ) ";
+
+        //echo " kk: $query !";
+
+        $qres = mysqli_query($con,$query);
+        if($qres == true) 
+            $count = mysqli_num_rows($qres);
+        if($qres == true && $count != 0){
+            $error = "";
+        }
+        else{
+            $error = "No results from query"; 
+        }
     }
 ?>
 
@@ -161,22 +273,33 @@
                                         <th>Rate</th>
                                         <th>Cost</th>
                                     </tr> ";
-                            echo "<tr><td>" . "Number 13" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Dram" . "</td><td>" . "1922" . "</td><td>" . "6.3" . "</td><td>" . "30$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "The Pleasure Garden" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Dram" . "</td><td>" . "1925" . "</td><td>" . "5.7" . "</td><td>" . "20$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "The Mountain Eagle" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Dram" . "</td><td>" . "1926" . "</td><td>" . "7.4" . "</td><td>" . "40$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "The Ring" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Romance" . "</td><td>" . "1927" . "</td><td>" . "7.3" . "</td><td>" . "40$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "Downhill" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Dram" . "</td><td>" . "1927" . "</td><td>" . "7.8" . "</td><td>" . "45$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "Psycho" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Horror" . "</td><td>" . "1960" . "</td><td>" . "8.2" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr></table>";
+                            if($qres == true){
+                                while( $row = mysqli_fetch_array($qres)){
+                                    echo "<tr>";
+                                    echo "<td>" . $row['f_title'] . "</td>";
+                                    echo "<td>" . $row['f_director'] . "</td>";
+                                    echo "<td>" . $row['f_genre'] . "</td>";
+                                    echo "<td>" . $row['f_year'] . "</td>";
+                                    if( is_null( $row['f_rating'] ) )
+                                        echo "<td>" . "-" . "</td>";
+                                    else
+                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                    echo "<td>" . $row['f_price'] . "$</td>";
+                                    echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
+                                    echo "</tr>";
+                                }
+                                echo "</table>";
+                            }
                         }
                         else {
                             echo "<p style=\"text-align: left; color: red;\">No such film exsists...</p>";
                             echo "<p style=\"text-align: left;\">Can't find what you are looking for? Request a new film here:</p>
                             <form method=\"post\" class=\"example\">
-                                <input name=\"title\" type=\"text\" size=\"10\" placeholder = \"Title\" required>
-                                <input name=\"director\" type=\"numerical\" size=\"10\" placeholder = \"Director\" required>
-                                <input name=\"genre\" type=\"numerical\" size=\"5\" placeholder = \"Genre\" required>
-                                <input name=\"year\" type=\"numerical\" size=\"2\" placeholder = \"Year\" required><br>
-                                <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments\" id=\"comments\" placeholder=\"Additional Coments...\" style=\"width: 335px; resize: none;\"></textarea><br>
+                                <input name=\"title_r\" type=\"text\" size=\"10\" placeholder = \"Title\" required>
+                                <input name=\"director_r\" type=\"numerical\" size=\"10\" placeholder = \"Director\" required>
+                                <input name=\"genre_r\" type=\"numerical\" size=\"5\" placeholder = \"Genre\" required>
+                                <input name=\"year_r\" type=\"numerical\" size=\"2\" placeholder = \"Year\" required><br>
+                                <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments_r\" id=\"comments\" placeholder=\"Additional Coments...\" style=\"width: 335px; resize: none;\"></textarea><br>
                                 <button name=\"request\" type=\"submit\"> Make Request</button>  
                             </form>";
                         }

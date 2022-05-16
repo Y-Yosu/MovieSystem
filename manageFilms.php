@@ -3,6 +3,17 @@
     session_start();
     $error = "";
     $admin = "admin";
+    
+    $query = "SELECT U.user_name, U.user_surname, A.af_title, A.af_director, A.af_genre, A.af_year, R.request_desc, A.af_id FROM user as U, absent_film as A, request as R WHERE A.af_id = R.af_id AND R.user_id = U.user_id";
+    $qres = mysqli_query($con,$query);
+    if($qres == true) 
+        $count = mysqli_num_rows($qres);
+    if($qres == true && $count != 0){
+        $error = "";
+    }
+    else{
+        $error = "No results from server"; 
+    }
 
     if(isset($_POST['home'])) {
         header("Location: home.php");
@@ -24,6 +35,29 @@
     }
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
+    }
+    if(isset($_POST['addFilm'])) { 
+        
+        $query2 = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'emre_aydogmus' AND TABLE_NAME = 'film'";
+        $qres2 = mysqli_query($con,$query2);
+        $row2 = mysqli_fetch_array($qres2);
+        $next_id = $row2['AUTO_INCREMENT'];
+        
+        $query2 = "INSERT INTO film ( f_title, f_director, f_year, f_rating, f_genre, f_price, f_desc) "
+        . "VALUES( '".$_POST['title']."', '".$_POST['director']."', '".$_POST['year']."', NULL, '".$_POST['genre']."', '".$_POST['cost']."', '".$_POST['description']."' )";
+        $qres2 = mysqli_query($con,$query2);
+        
+        $query2 = "INSERT INTO part_of ( f_id, series_name, order_no ) "
+        . "VALUES( '".$next_id."', '".$_POST['series']."', NULL )";
+        $qres2 = mysqli_query($con,$query2);
+        header("Location: manageFilms.php");
+    }
+    if(isset($_POST['deleteRequest'])) {
+
+        $query3 = "DELETE FROM absent_film WHERE af_id = ".$_POST['deleteRequest']."";
+        $qres3 = mysqli_query($con,$query3);
+
+        header("Location: manageFilms.php");
     }
 ?>
 
@@ -138,30 +172,44 @@
             <div style="padding:0 10px;">
                 <h3 style="text-align: left;">Add film</h3>
                 <form method="post" class="example">
-                    <input name="title" type="text" size="10" placeholder = "Title">
-                    <input name="director" type="numerical" size="10" placeholder = "Director">
-                    <input name="genre" type="numerical" size="5" placeholder = "Genre">
-                    <input name="year" type="numerical" size="2" placeholder = "Year">
-                    <input name="cost" type="numerical" size="1" placeholder = "Cost">
-                    <input name="series" type="text" size="10" placeholder = "Series"><br>
-                    <textarea wrap="off" cols="30" rows="5" name="comments" id="comments" placeholder="Description" style="width: 495px; resize: none;"></textarea><br>
-                    <button name="search" type="submit" style="width:  75px">Add</button>  
+                    <input name="title" type="text" size="10" placeholder = "Title" required>
+                    <input name="director" type="numerical" size="10" placeholder = "Director" required>
+                    <input name="genre" type="numerical" size="5" placeholder = "Genre" required>
+                    <input name="year" type="numerical" size="2" placeholder = "Year" required>
+                    <input name="cost" type="numerical" size="1" placeholder = "Cost" required>
+                    <input name="series" type="text" size="10" placeholder = "Series" required><br>
+                    <textarea wrap="off" cols="30" rows="5" name="description" id="description" placeholder="Description" style="width: 495px; resize: none;" required></textarea><br>
+                    <button name="addFilm" type="submit" style="width:  75px">Add</button>  
                 </form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 
                 <h3 style="text-align: left;">Requests</h3>
                     <?php
                         if($error == "") {
-                            echo "
-                            <b>Yusuf Uyar</b><br>
-                            <b>Title: </b><p>Ice Age 3</p><b>    Director: </b><p>Carlos Saldanha</p><b>    Genre: </b><p>Comedy</p><b>    Year: </b><p>2009<p><br>
-                            <b>Coment: </b><p>Realy good film. Please add</p><br>
-                            <form method=\"post\"><button type=\"submit\" name=\"deleteRequest\" class=\"rentButton\">Delete Request</button></form>
-                            <hr style=\"width: 500px; text-align:left; margin-left:0\">";
-                            echo "
-                            <b>Cagri Durgut</b><br>
-                            <b>Title: </b><p>3 Idiots</p><b>    Director: </b><p>Rajkumar Hirani</p><b>    Genre: </b><p>Comedy</p><b>    Year: </b><p>2009<p><br>
-                            <form method=\"post\"><button type=\"submit\" name=\"deleteRequest\" class=\"rentButton\">Delete Request</button></form>
-                            <hr style=\"width: 500px; text-align:left; margin-left:0\">";
+
+                            if($qres == true){
+                                while( $row = mysqli_fetch_array($qres)){
+                                    echo "
+                                    <b>" . $row['user_name'] . " " .$row['user_surname']. "</b><br>
+                                    <b>Title: </b><p>".$row['af_title']."</p><b>    Director: </b><p>".$row['af_director']."</p><b>    Genre: </b><p>".$row['af_genre']."</p><b>    Year: </b><p>".$row['af_year']."<p><br>";
+                                    //<b>Coment: </b><p>Realy good film. Please add</p><br>
+                                    if( is_null($row['request_desc']) OR $row['request_desc'] == "" )
+                                        echo "<p>User added no comments.</p><br>";
+                                    else
+                                        echo "<b>Comment: </b><p>".$row['request_desc']."</p><br>";
+                                    echo "
+                                    <form method=\"post\"><button type=\"submit\" name=\"deleteRequest\" class=\"rentButton\" value = ".$row['af_id'].">Discard Request</button></form>
+                                    <hr style=\"width: 500px; text-align:left; margin-left:0\">";
+                                    /*
+                                    if( is_null( $row['f_rating'] ) )
+                                        echo "<td>" . "-" . "</td>";
+                                    else
+                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                        */
+                                    
+                                }
+                                echo "</table>";
+                            }
+
                         }
                         else {
                             echo "<p style=\"text-align: left; color: red;\">There are no requests</p>";

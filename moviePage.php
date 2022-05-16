@@ -1,26 +1,99 @@
 <?php
+    function debug_to_console($data) {
+        $output = $data;
+        if (is_array($output))
+            $output = implode(',', $output);
+
+        echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+    }
+?>
+<?php
+
     session_start();
+    require_once 'connect.php';
+    $sid = $_SESSION['sid'];
+    if(array_key_exists("goToMovie", $_POST))
+        $_SESSION['goToMovie'] = $_POST["goToMovie"];
+    $movieId = $_SESSION['goToMovie'];
+
+    $query = "select * from film where f_id = '$movieId';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    
+    
     $error = "";
     $admin = "admin";
+    
+    $title = $row[1];
+    $director = $row[2];
+    $year = $row[3];
+    $rate = $row[4];
+    $genre = $row[5];
+    $cost = "$row[6]$";
+    $description = $row[7];
+    $userrated = false;
+    $userreviewed = false;
+    $rentStatus = false;
+    $isSeries = false;
+    
+    $query = "select * from part_of where f_id = '$movieId';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    if($row){
+        $isSeries = true;
+        $seriesId = $row[1];
+    }
 
-    $title = "Psycho";
-    $director = "Alfred Hitchcock";
-    $genre = "Horror";
-    $year = "1960";
-    $rate = "8.2";
-    $cost = "50$";
-    $description = "Psycho is Hitchcock's most widely known film. It centers around a woman named Marion Crane (played by Janet Leigh), who steals $40,000 from her employer so she can run away with the man she loves and start a new life. ";
-    $rentStatus = "";
+    $query = "select * from rent where f_id = '$movieId' AND user_id = '$sid';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
 
+    if($row){
+        $rentStatus = $row[3];
+    }
+    
+    $query = "select * from rate where f_id = '$movieId' AND user_id = '$sid';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    if($row){
+        $userrated = true;
+        $oldRating = $row[3];
+    }
+    
+    $query = "select * from review where f_id = '$movieId' AND user_id = '$sid';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+    if($row){
+        $userreviewed = true;
+        $oldReview = $row[3];
+        debug_to_console($oldReview);
+    }
+
+    if($rentStatus)
+        debug_to_console($rentStatus);
+    
+
+    if(isset($_POST['rate'])) {
+
+        debug_to_console('comments ' . $_POST['comments']);
+        debug_to_console('rating ' . $_POST['rating']);
+
+        if($userrated){
+            $query = "update rate Set r_rating = " . $_POST['rating'] . " where f_id = '$movieId' AND user_id = '$sid';";
+            $result = $con->query($query);}
+        if($userreviewed){
+            $query = "update review Set r_text = '" . $_POST['comments'] . "' where f_id = '$movieId' AND user_id = '$sid';";
+            $result = $con->query($query);}
+    }
 
     if(isset($_POST['home'])) {
-        header("Location: home.php");
+        header("Location: ../home.php");
     }
     if(isset($_POST['rentedMovies'])) {
-        header("Location: rentedMovies.php");
+        header("Location: ../rentedMovies.php");
     }
     if(isset($_POST['rentHistory'])) {
-        header("Location: rentHistory.php");
+        header("Location: ../rentHistory.php");
     }
     if(isset($_POST['friends'])) {
         header("Location: friends.php");
@@ -34,6 +107,21 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['Rent'])) {
+        
+    }
+
+    
+    // if($userrated)
+    //     debug_to_console($oldRating);
+
+    // $query = "select * from review where f_id = '$movieId' AND user_id = '$sid';";
+    // $result = $con->query($query);
+    // $row = $result->fetch_array(MYSQLI_NUM);
+    // if($row){
+    //     $userreviewed = true;
+    //     $oldReview = $row[3];
+    // }
 
 ?>
 
@@ -154,48 +242,81 @@
                 <b style="margin-left: 15px">Year: </b><p> <?php echo $year; ?></p>
                 <b style="margin-left: 15px">Rate: </b><p> <?php echo $rate; ?></p></div><br>
                 <b>Description: </b><p> <?php echo $description; ?></p>
-                <form method="post"><button type="submit" name="Rent" style="border: none;text-align: center;cursor: pointer;background-color: rgb(245, 233, 218);color: blue;text-decoration-line: underline;font-size : 16px;}">Related Series</button></form>
-                <b>Rent Status: </b><?php if($rentStatus == "Rented") echo "<p style=\"color: green;\">Already Rented</p>";  else echo "<form method=\"post\" style=\"display: inline;\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Rent for: $cost</button></form>" ?><br>
-                <form method="post" class="example"><button name="recomend" type="submit" style="width: 100px;" >Recomend</button></form>
+                <?php
+                    if($isSeries){
+                        $_SESSION['series'] = $seriesId;
+                        echo "<form action=\"series.php\" method=\"post\">
+                        <button type=\"submit\" name=\"Rent\" style=\"border: none;text-align: center;cursor: pointer;background-color: rgb(245, 233, 218);color: blue;text-decoration-line: underline;font-size : 16px;}\">Related Series</button>
+                        </form>";
+                    }
+                ?>
+                
+                <?php
+                    if($rentStatus == "Rented") echo "<p style=\"color: green;\">Already Rented</p>";
+                    else echo "<form method=\"post\" style=\"display: inline;\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Rent for: $cost</button></form>" 
+                ?><br><br>
+                <form method="post" class="example"><button name="recomend" type="submit" style="width: 100px;" >Recommend</button></form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 
-                <form action="/html/tags/html_form_tag_action.cfm" method="post" class="example">
+                <?php
+                if($userrated ) 
+                echo "";
+                if($rentStatus == "Rented" || $rentStatus == "Expired" ) 
+                echo " <form method=\"post\" class=\"example\">
                     <b>Rate: </b><br>
-                    <textarea wrap="off" cols="30" rows="5" name="comments" id="comments" placeholder="Add your coment here if you have any..." style="width: 500px; resize: none;"></textarea><br>
-                    <label class="rating-label">
+                    <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments\" id=\"comments\" placeholder=\"Add your comment here if you have any...\" style=\"width: 500px; resize: none;\"></textarea><br>
+                    <label class=\"rating-label\">
                     <input
-                        class="rating"
-                        max="5"
-                        oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)"
-                        step="0.5"
-                        style="--value:0"
-                        type="range"
-                        value="0">
+                        class=\"rating\"
+                        id=\"ratingslider\"
+                        name=\"rating\"
+                        max=\"5\"
+                       
+                        step=\"0.5\"
+                        style=\"--value:0\"
+                        type=\"range\"
+                        value=\"0\">
                     </label>
-                    <button name="rate" type="submit" style="width: 100px;" >Rate</button>  
-                </form>
-                <hr style="width: 500px; text-align:left; margin-left:0"> 
+                    <button id=\"submitbutton\" name=\"rate\" style=\"width: 100px;\" >Rate</button>  
+                </form>";
+                
+                else echo "<p style=\"color: red;\">You are not allowed to rate this movie since you don't own it.</p>";
+                ?>
+                
+               
+                <hr style="width: 500px; text-align:left; margin-left:0">
+
+                 
                 <?php 
-                    echo "
-                        <b>Yusuf Uyar</b><br>
-                        <p>Not gonna lie, they had me in the first half. A well made thriller, always keeping the audience guessing as to what's going to happen. Well made, well acted, and wonderfully dark vibes.</p><br>
-                        <b>Rate: 4.0</b><br>
-                        <hr style=\"width: 500px; text-align:left; margin-left:0\">";
-                    echo "
-                        <b>Cagri Durgut</b><br>
-                        <b>Rate: 4.0</b><br>
-                        <hr style=\"width: 500px; text-align:left; margin-left:0\">";
-                    echo "
-                        <b>Ali Emre</b><br>
-                        <p>I like the bit where he looks out the window and sees the haunted house on the hill</p><br>
-                        <b>Rate: 3.5</b><br>
-                        <hr style=\"width: 500px; text-align:left; margin-left:0\">";
-                    echo "
-                        <b>Seckin Satir</b><br>
-                        <b>Rate: 4.5</b><br>
-                        <hr style=\"width: 500px; text-align:left; margin-left:0\">";
+                    
+                    $query = "select * from rate Natural Join user where f_id = '$movieId';";
+                    $result = $con->query($query);
+                    $row = $result->fetch_array(MYSQLI_NUM);
+                    while($row){
+                        $query2 = "select * from review where f_id = '$movieId' AND user_id = '$row[0]';";
+                        $result2 = $con->query($query2);
+                        $row2 = $result2->fetch_array(MYSQLI_NUM);
+                        if($row[0] == $sid)
+                            echo "<b style=\"color:blue;\">You</b><br>";
+                        else
+                            echo "<b>$row[4] $row[5]</b><br>";
+                        if($row2)
+                            echo "<p>$row2[3].</p><br>";
+                        echo "<b>Rate: $row[3]</b><br>";
+                        echo "<hr style=\"width: 500px; text-align:left; margin-left:0\">";
+                        // if($row2 != "")
+                        //     debug_to_console("person: " . $row[4] . " rate: " . $row[3] . " review: " . $row2[3]. " date: " . $row[2]);
+                        // else
+                        //     debug_to_console("person: " . $row[4] . " rate: " . $row[3] . " date: " . $row[2]);
+                        $row = $result->fetch_array(MYSQLI_NUM);
+                    }
                 ?> 
             </div>
         </div>
 
-    </body>  
+    </body>
+    <script>
+        let a = document.getElementById('ratingslider')
+        a.oninput = ()=>{a.style.setProperty('--value', `${a.valueAsNumber}`);}
+        let button = document.getElementById('submitbutton')
+    </script>
 </html>

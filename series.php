@@ -1,10 +1,23 @@
 <?php
+    function debug_to_console($data) {
+        $output = $data;
+        if (is_array($output))
+            $output = implode(',', $output);
+
+        echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+    }
+?><?php
     require_once 'connect.php';
     session_start();
     $error = "";
     $admin = "admin";
-    $title = "Psycho";
-    $description = "Psycho is an American horror franchise consisting of six films loosely based on the Psycho novels by Robert Bloch: Psycho, Psycho II, Psycho III, Bates Motel, Psycho IV: The Beginning, the 1998 remake of the original film, and additional merchandise spanning various media.";
+    $query = "select * from series where series_name = '" . $_SESSION['series'] . "';";
+    $result = $con->query($query);
+    $row = $result->fetch_array(MYSQLI_NUM);
+
+
+    $title = $row[0];
+    $description = $row[1];
 
     if(isset($_POST['home'])) {
         header("Location: home.php");
@@ -140,8 +153,7 @@
             <b>Description: </b><p> <?php echo $description; ?></p>
                     <?php
                         if($error == "") {
-                            echo "<h3 style=\"text-align: left;\">Rented Films:</h3>
-                                <table>
+                            echo "<h3 style=\"text-align: left;\">Rented Films:</h3><table>
                                     <tr>
                                         <th>Title</th>
                                         <th>Director</th>
@@ -151,12 +163,17 @@
                                         <th>Cost</th>
                                     </tr> ";
 
-                            echo "<tr><td>" . "Psycho" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Horror" . "</td><td>" . "1960" . "</td><td>" . "8.2" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "Psycho II" . "</td><td>" . "Richard Franklin" . "</td><td>" . "Horror" . "</td><td>" . "1983" . "</td><td>" . "7.3" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            echo "<tr><td>" . "Psycho III" . "</td><td>" . "Alfred Hitchcock" . "</td><td>" . "Horror" . "</td><td>" . "1986" . "</td><td>" . "6.7" . "</td><td>" . "50$" ."</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Movie Page</button></form></td></tr></table>";
+                            $query = "select * from part_of natural join film where series_name = '$title' order by order_no asc;";
+                            $result = $con->query($query);
+                            $row = $result->fetch_array(MYSQLI_NUM);
+                            while($row){
+                                debug_to_console( $row );
+                                    echo "<tr><td>" . "$row[3]" . "</td><td>" . "$row[4]" . "</td><td>" . "$row[7]" . "</td><td>" . "$row[5]" . "</td><td>" . "$row[6]" . "</td><td>" . "$row[8]$" ."</td><td style=\"text-align:left;\"><form action=\"moviePage.php\" method=\"post\"><button type=\"submit\" name=\"goToMovie\" value=\"$row[0]\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                                $row = $result->fetch_array(MYSQLI_NUM);
+                            }
                         }
                         else {
-                            echo "<p style=\"text-align: left; color: red;\">There are currently no rented films...</p>";
+                            echo "<p style=\"text-align: left; color: red;\">There are currently no films...</p>";
                         }
                     ?>
             </div>

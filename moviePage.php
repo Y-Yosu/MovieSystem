@@ -79,21 +79,30 @@
         debug_to_console('rating ' . $_POST['rating']);
 
         if($userrated){
-            $query = "update rate Set r_rating = " . $_POST['rating'] . " where f_id = '$movieId' AND user_id = '$sid';";
+            $query = "update rate Set r_rating = " . $_POST['rating'] . ",r_date = now() where f_id = '$movieId' AND user_id = '$sid';";
             $result = $con->query($query);}
+        else{
+            $query = " insert into rate Values( ". $sid .",". $movieId .",now()," . $_POST['rating'] . " );";
+            $result = $con->query($query);
+        }
         if($userreviewed){
             $query = "update review Set r_text = '" . $_POST['comments'] . "' where f_id = '$movieId' AND user_id = '$sid';";
             $result = $con->query($query);}
+        else{
+            $query = " insert into review Values( ". $sid .",". $movieId .",now(),'" . $_POST['comments'] . "' );";
+            // debug_to_console($query);
+            $result = $con->query($query);
+        }
     }
 
     if(isset($_POST['home'])) {
-        header("Location: ../home.php");
+        header("Location: home.php");
     }
     if(isset($_POST['rentedMovies'])) {
-        header("Location: ../rentedMovies.php");
+        header("Location: rentedMovies.php");
     }
     if(isset($_POST['rentHistory'])) {
-        header("Location: ../rentHistory.php");
+        header("Location: rentHistory.php");
     }
     if(isset($_POST['friends'])) {
         header("Location: friends.php");
@@ -108,7 +117,31 @@
         header("Location: manageUsers.php");
     }
     if(isset($_POST['Rent'])) {
-        
+        if($rentStatus == "Ongoing"){
+
+        }
+        else {
+            $query = "select * from user natural join has natural join card where user_id = '$sid'";
+            $result = $con->query($query);
+            $row = $result->fetch_array(MYSQLI_NUM);
+            debug_to_console($row);
+            $wallet = $row[6];
+            $cardid = $row[0];
+            // debug_to_console(($wallet-$cost));
+            if( floatval($wallet) >= floatval($cost) ){
+                if($rentStatus == "Expired"){
+                    $query = "update rent Set rent_date = now(), rent_status = 'Ongoing' where f_id = '$movieId' AND user_id = '$sid';";
+                    $result = $con->query($query);
+                }
+                else{
+                    $query = "insert into rent Values($sid,'$movieId',now(),'Ongoing');";
+                    $result = $con->query($query);
+                }
+                $query = "update card Set balance = " . ($wallet-$cost) . " where card_id = '$cardid';";
+                $result = $con->query($query);
+                header("Refresh:0");
+            }
+        }
     }
 
     
@@ -246,13 +279,13 @@
                     if($isSeries){
                         $_SESSION['series'] = $seriesId;
                         echo "<form action=\"series.php\" method=\"post\">
-                        <button type=\"submit\" name=\"Rent\" style=\"border: none;text-align: center;cursor: pointer;background-color: rgb(245, 233, 218);color: blue;text-decoration-line: underline;font-size : 16px;}\">Related Series</button>
+                        <button type=\"submit\" style=\"border: none;text-align: center;cursor: pointer;background-color: rgb(245, 233, 218);color: blue;text-decoration-line: underline;font-size : 16px;}\">Related Series</button>
                         </form>";
                     }
                 ?>
                 
                 <?php
-                    if($rentStatus == "Rented") echo "<p style=\"color: green;\">Already Rented</p>";
+                    if($rentStatus == "Ongoing") echo "<p style=\"color: green;\">Already Rented</p>";
                     else echo "<form method=\"post\" style=\"display: inline;\"><button type=\"submit\" name=\"Rent\" class=\"rentButton\">Rent for: $cost</button></form>" 
                 ?><br><br>
                 <form method="post" class="example"><button name="recomend" type="submit" style="width: 100px;" >Recommend</button></form>
@@ -260,7 +293,7 @@
                 <?php
                 if($userrated ) 
                 echo "";
-                if($rentStatus == "Rented" || $rentStatus == "Expired" ) 
+                if($rentStatus == "Ongoing" || $rentStatus == "Expired" ) 
                 echo " <form method=\"post\" class=\"example\">
                     <b>Rate: </b><br>
                     <textarea wrap=\"off\" cols=\"30\" rows=\"5\" name=\"comments\" id=\"comments\" placeholder=\"Add your comment here if you have any...\" style=\"width: 500px; resize: none;\"></textarea><br>

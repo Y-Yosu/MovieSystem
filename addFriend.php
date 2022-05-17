@@ -1,6 +1,11 @@
 <?php
     require_once 'connect.php';
     session_start();
+    if(is_null($_SESSION['sname'])) {
+        header("Location: notlogedin.php");
+    }
+    
+    
     $error = "found";
     $admin = "admin";
 
@@ -49,6 +54,11 @@
         $query = "SELECT DISTINCT U.user_id, U.user_name, U.user_surname, U.user_mail FROM user as U, add_friend as A WHERE U.user_id <> '".$_SESSION["sid"]."' AND U.user_id NOT IN ( SELECT adder_id FROM add_friend WHERE added_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' or request_status = 'Pending')) AND U.user_id NOT IN( SELECT added_id FROM add_friend WHERE adder_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' OR request_status = 'Pending') )";
         $result = mysqli_query($con, $query);
         header("Location: addFriend.php");
+    }
+    if(isset($_POST['logout'])){
+        if(session_destroy()){
+            header("location: index.php");
+        }
     }
 ?>
 
@@ -157,6 +167,7 @@
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
 

@@ -1,6 +1,11 @@
 <?php
     require_once 'connect.php';
     session_start();
+    
+    if(is_null($_SESSION['sname'])) {
+        header("Location: notlogedin.php");
+    }
+
     $error = "";
     $admin = "admin";
 
@@ -142,6 +147,11 @@
             $error = "No results from query"; 
         }
     }
+    if(isset($_POST['logout'])){
+        if(session_destroy()){
+            header("location: index.php");
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -248,6 +258,7 @@
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
 

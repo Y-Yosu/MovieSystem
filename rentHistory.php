@@ -1,6 +1,11 @@
 <?php
     require_once 'connect.php';
     session_start();
+    
+    if(is_null($_SESSION['sname'])) {
+        header("Location: notlogedin.php");
+    }
+    
     $error = "";
     $admin = "admin";
 
@@ -42,6 +47,11 @@
     if(isset($_POST['moviePage'])) {
         $_SESSION['goToMovie'] = $_POST['moviePage'];
         header("Location: moviePage.php");
+    }
+    if(isset($_POST['logout'])){
+        if(session_destroy()){
+            header("location: index.php");
+        }
     }
     if(isset($_POST['search'])) {
         
@@ -211,6 +221,7 @@
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
 

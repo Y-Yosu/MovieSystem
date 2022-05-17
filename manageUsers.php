@@ -1,6 +1,11 @@
 <?php
     require_once 'connect.php';
     session_start();
+    
+    if(is_null($_SESSION['sname'])) {
+        header("Location: notlogedin.php");
+    }
+    
     $error = "found";
     $admin = "admin";
 
@@ -52,6 +57,14 @@
  
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['add'])) {
+        #$_POST['email'], $_POST['name'], $_POST['surname'], $_POST['password']
+    }
+    if(isset($_POST['logout'])){
+        if(session_destroy()){
+            header("location: index.php");
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -81,16 +94,16 @@
         background-color: #daf5e9;
         }
         /* Control the right side */
-    .right {
+        .right {
         height: 100%;
         width: 75%;
         position: fixed;
         z-index: 1;
         top: 0;
         overflow-x: hidden;
-        padding-top: 10px;
+        padding-top: 40px;
         right: 0;
-        }      
+        }   
     b, p {display: inline;}
     .applyButton  {border: none;
                    cursor: pointer;
@@ -159,11 +172,21 @@
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
 
         <div class="right" >
             <div style="padding:0 10px;">
+                <h3 style="text-align: left;">Add User</h3>
+                <form method="post" class="example">
+                    <input name="email" type="text" size="20" placeholder = "Email" required>
+                    <input name="name" type="numerical" size="15" placeholder = "Name" required>
+                    <input name="surname" type="numerical" size="15" placeholder = "Surname" required>
+                    <input name="password" type="numerical" size="15" placeholder = "Password" required><br>
+                    <button name="addUser" type="submit" style="width:  75px">Add</button>  
+                </form>
+                <hr style="width: 600px; text-align:left; margin-left:0"> 
                 <h3 style="text-align: left;">Search User:</h3>
                 <form method="post" class="example">
                     <input name="name" type="text" size="5" placeholder = "Name">

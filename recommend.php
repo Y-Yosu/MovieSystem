@@ -1,6 +1,27 @@
 <?php
+    function debug_to_console($data) {
+        $output = $data;
+        if (is_array($output))
+            $output = implode(',', $output);
+
+        echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+    }
+?>
+<?php
+    require_once 'connect.php';
     session_start();
     $error = "";
+    $sid = $_SESSION['sid'];
+    $movieId = $_SESSION['goToMovie'];
+    
+    if(isset($_POST['recomend'])) {
+        $toFriend = $_POST['f1'];
+        $query = "INSERT INTO recommend (recommender_id, receiver_id, f_id) VALUES ('".$sid."', '".$toFriend."', '".$movieId."' )";
+        $result = $con->query($query);
+        
+        header("Location: home.php");
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -97,16 +118,32 @@
     </style>
 </head>
     <body>
-        <form action="/html/tags/html_form_tag_action.cfm" method="post" class="example">
-            <fieldset>
-                <legend style="text-align: center;">Select Friends to recomend</legend>
-                <input type="radio" name="f1" id="track" value="track" /><label for="track">Yusuf Uyar</label><br/>
-                <input type="radio" name="f2" id="event" value="event"  /><label for="event">Ali Emre</label><br/>
-                <input type="radio" name="f3" id="message" value="message" /><label for="message">Cagri Durgut</label><br/>
-                <input type="radio" name="f3" id="message" value="message" /><label for="message">Seckin Satir</label><br/>
-                <div style="text-align: center;"><button name="recomend" type="submit" style="width: 100px;" >Recomend</button></div>
-            </fieldset>
-             
+        <?php
+            $query = "SELECT U.user_id, U.user_name, U.user_mail, U.user_surname FROM user as U, add_friend as A WHERE ( A.adder_id = '".$_SESSION['sid']."' AND U.user_id = A.added_id AND A.request_status = 'Accepted' AND NOT EXISTS ( SELECT * FROM recommend as R WHERE R.receiver_id = U.user_id AND R.f_id = '".$_SESSION['goToMovie']."' ) )OR ( A.added_id = '".$_SESSION['sid']."' AND U.user_id = A.adder_id AND A.request_status = 'Accepted' AND NOT EXISTS ( SELECT * FROM recommend as R WHERE R.receiver_id = U.user_id AND R.f_id = '".$_SESSION['goToMovie']."' ) )";
+            $result = mysqli_query($con, $query);
+            if($result == true) 
+                $count = mysqli_num_rows($result);
+            if($result == true && $count != 0){
+                echo "
+                <form method=\"post\" class=\"example\">
+                    <fieldset>
+                        <legend style=\"text-align: center;\">Select Friends to recomend</legend>
+                ";
+
+                while($row = mysqli_fetch_array($result)) {
+                    echo "
+                    <input type=\"radio\" name=\"f1\" id=\"track\" value=\"" . $row['user_id'] . "\" /><label for=\"track\">" . $row['user_name'] . " " . $row['user_surname'] . " " . $row['user_mail'] . "</label><br/>";
+                }
+                echo "
+                    <div style=\"text-align: center;\"><button name=\"recomend\" type=\"submit\" style=\"width: 100px;\" >Recommend</button></div>
+                </fieldset>
+                ";
+            }
+            else {
+                echo "<p style=\"text-align: left; color: red;\">You don't have any friends that you haven't recommend this movie curently...</p><br><a href=\"home.php\">Return Home</a>";
+            }
+            
+        ?>             
         </form>   
     </body>  
 </html>

@@ -20,12 +20,6 @@
             $_SESSION['surname'] = $str2 = ucfirst(strtolower($row[1]));
             $_SESSION['sid'] = $row[2];
             $_SESSION['mail'] = $mail;
-
-            $query2 = "SELECT C1.balance FROM card as C1, customer as C2, has as C3 WHERE C1.card_id = C3.card_id AND C2.user_id = '".$_SESSION["sid"]."' AND C3.user_id = C2.user_id;";
-            $result2 = mysqli_query($con, $query2);
-            $row2 = mysqli_fetch_array($result2);
-
-            $_SESSION['wallet'] = strval($row2[0]) . "$";
             header("Location: home.php"); 
         }
         else{

@@ -7,12 +7,11 @@
     }
     
     $error = "";
-    $admin = "admin";
     $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
     $result = $con->query($query);
     $row = $result->fetch_array(MYSQLI_NUM);
     $wallet = $row[6];
-    $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
+    $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
     $qres = mysqli_query($con,$query);
     //echo "Query: $query\n";
     
@@ -63,19 +62,19 @@
         
         $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id ".
                         "FROM film as F, rent as R ".
-                        "WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id AND ( ( ";
+                        "WHERE R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id AND ( ( ";
 
         if( $f_title == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$f_title'";
-        $query = $query . " IS NULL) OR (F.f_title = '$f_title') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (F.f_title LIKE '%$f_title%') ) AND ( ( ";
         
         if( $f_director == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$f_director'";
-        $query = $query . " IS NULL) OR (F.f_director = '$f_director') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (F.f_director LIKE '%$f_director%') ) AND ( ( ";
         
         if( $f_year == "" )
             $query = $query . "NULL";
@@ -87,19 +86,19 @@
             $query = $query . "NULL";
         else
             $query = $query . "'$f_genre'";
-        $query = $query . " IS NULL) OR (F.f_genre = '$f_genre') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (F.f_genre LIKE '%$f_genre%') ) AND ( ( ";
         
         if( $minr == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$minr'";
-        $query = $query . " IS NULL) OR (F.f_rating > '$minr') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (F.f_rating >= '$minr') ) AND ( ( ";
         
         if( $maxr == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$maxr'";
-        $query = $query . " IS NULL) OR (F.f_rating < '$maxr') ) ORDER BY R.rent_date";
+        $query = $query . " IS NULL) OR (F.f_rating <= '$maxr') ) ORDER BY R.rent_date";
 
         //echo " kk: $query !";
 
@@ -217,7 +216,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
@@ -249,15 +248,25 @@
                                     </tr> ";
                             if($qres == true){
                                 while( $row = mysqli_fetch_array($qres)){
-                                    echo "<tr>";
-                                    echo "<td>" . $row['f_title'] . "</td>";
-                                    echo "<td>" . $row['f_director'] . "</td>";
-                                    echo "<td>" . $row['f_genre'] . "</td>";
-                                    echo "<td>" . $row['f_year'] . "</td>";
-                                    echo "<td>" . $row['f_rating'] . "</td>";
-                                    echo "<td>" . $row['rent_date'] . "</td>";
-                                    echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
-                                    echo "</tr>";
+                                    
+                                    $target = date_create(date('Y-m-d'));
+                                    $origin = date_create($row['rent_date']);
+                                    $interval = date_diff($origin, $target);
+                                    $intervalint = $interval->format('%a');
+                                    //echo "DAYS------------------------- DAYS: $intervalint\n";
+                                    if( $intervalint > 30 )
+                                        continue;
+                                    else{
+                                        echo "<tr>";
+                                        echo "<td>" . $row['f_title'] . "</td>";
+                                        echo "<td>" . $row['f_director'] . "</td>";
+                                        echo "<td>" . $row['f_genre'] . "</td>";
+                                        echo "<td>" . $row['f_year'] . "</td>";
+                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                        echo "<td>" . $row['rent_date'] . "</td>";
+                                        echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
+                                        echo "</tr>";
+                                    }
                                 }
                                 echo "</table>";
                             }

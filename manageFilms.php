@@ -7,7 +7,6 @@
     }
     
     $error = "";
-    $admin = "admin";
     
     $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
     $result = $con->query($query);
@@ -186,7 +185,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>

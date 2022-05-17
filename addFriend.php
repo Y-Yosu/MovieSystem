@@ -7,7 +7,6 @@
     
     
     $error = "found";
-    $admin = "admin";
 
     $query = "SELECT DISTINCT U.user_id, U.user_name, U.user_surname, U.user_mail FROM user as U, add_friend as A WHERE U.user_id <> '".$_SESSION["sid"]."' AND U.user_id NOT IN ( SELECT adder_id FROM add_friend WHERE added_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' or request_status = 'Pending')) AND U.user_id NOT IN( SELECT added_id FROM add_friend WHERE adder_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' OR request_status = 'Pending') )";
     $result = mysqli_query($con, $query);
@@ -19,11 +18,11 @@
 
         $query = "SELECT DISTINCT U.user_id, U.user_name, U.user_surname, U.user_mail FROM user as U, add_friend as A WHERE (U.user_id <> '".$_SESSION["sid"]."' AND U.user_id NOT IN ( SELECT adder_id FROM add_friend WHERE added_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' or request_status = 'Pending')) AND U.user_id NOT IN( SELECT added_id FROM add_friend WHERE adder_id = '".$_SESSION["sid"]."' AND (request_status = 'Accepted' OR request_status = 'Pending') )) AND ( ( ";
         if($name == "") $query = $query . "NULL"; else $query = $query . "'$name'"; 
-        $query = $query . " IS NULL) OR (U.user_name = '$name') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (U.user_name LIKE '%$name%') ) AND ( ( ";
         if($surname == "") $query = $query . "NULL"; else $query = $query . "'$surname'"; 
-        $query = $query . " IS NULL) OR (U.user_surname = '$surname') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (U.user_surname LIKE '%$surname%') ) AND ( ( ";
         if($mail == "") $query = $query . "NULL"; else $query = $query . "'$mail'"; 
-        $query = $query . " IS NULL) OR (U.user_mail = '$mail') )";
+        $query = $query . " IS NULL) OR (U.user_mail LIKE '%$mail%') )";
         $result = mysqli_query($con, $query);
     }
     if(isset($_POST['home'])) {
@@ -165,7 +164,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>

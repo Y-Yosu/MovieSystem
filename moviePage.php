@@ -31,7 +31,6 @@
     
     
     $error = "";
-    $admin = "admin";
     
     $title = $row[1];
     $director = $row[2];
@@ -58,7 +57,15 @@
     $row = $result->fetch_array(MYSQLI_NUM);
 
     if($row){
-        $rentStatus = $row[3];
+        $target = date_create(date('Y-m-d'));
+        $origin = date_create($row[2]);
+        $interval = date_diff($origin, $target);
+        $intervalint = $interval->format('%a');
+        //echo "DAYS------------------------- DAYS: $intervalint";
+        if( $intervalint > 30 )
+            $rentStatus = "Expired";
+        else
+            $rentStatus = "Ongoing";
     }
     
     $query = "select * from rate where f_id = '$movieId' AND user_id = '$sid';";
@@ -275,7 +282,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>

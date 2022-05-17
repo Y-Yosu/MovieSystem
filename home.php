@@ -7,7 +7,6 @@
     }
 
     $error = "";
-    $admin = "admin";
 
     $query = "SELECT f_title, f_director, f_year, f_rating, f_genre, f_price, f_id FROM film ";
     $qres = mysqli_query($con,$query);
@@ -91,13 +90,13 @@
             $query = $query . "NULL";
         else
             $query = $query . "'$f_title'";
-        $query = $query . " IS NULL) OR (f_title = '$f_title') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_title LIKE '%$f_title%') ) AND ( ( ";
         
         if( $f_director == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$f_director'";
-        $query = $query . " IS NULL) OR (f_director = '$f_director') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_director LIKE '%$f_director%') ) AND ( ( ";
         
         if( $f_year == "" )
             $query = $query . "NULL";
@@ -109,31 +108,31 @@
             $query = $query . "NULL";
         else
             $query = $query . "'$f_genre'";
-        $query = $query . " IS NULL) OR (f_genre = '$f_genre') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_genre = '%$f_genre%') ) AND ( ( ";
         
         if( $minr == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$minr'";
-        $query = $query . " IS NULL) OR (f_rating > '$minr') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_rating >= '$minr') ) AND ( ( ";
         
         if( $maxr == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$maxr'";
-        $query = $query . " IS NULL) OR (f_rating < '$maxr') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_rating <= '$maxr') ) AND ( ( ";
         
         if( $minp == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$minp'";
-        $query = $query . " IS NULL) OR (f_price > '$minp') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (f_price >= '$minp') ) AND ( ( ";
 
         if( $maxp == "" )
             $query = $query . "NULL";
         else
             $query = $query . "'$maxp'";
-        $query = $query . " IS NULL) OR (f_price < '$maxp') ) ";
+        $query = $query . " IS NULL) OR (f_price <= '$maxp') ) ";
 
         //echo " kk: $query !";
 
@@ -256,7 +255,7 @@
                 <button type="submit" name="rentedMovies" id="rentedMovies">Rented Movies</button>
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
-                <?php if($admin == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
+                <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
                 <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>

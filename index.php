@@ -20,6 +20,19 @@
             $_SESSION['surname'] = $str2 = ucfirst(strtolower($row[1]));
             $_SESSION['sid'] = $row[2];
             $_SESSION['mail'] = $mail;
+
+            $query = "SELECT * FROM employee WHERE user_id = '".$_SESSION['sid']."'";
+            $result = mysqli_query($con, $query);
+
+            if($result == true) 
+                $count = mysqli_num_rows($result);
+            
+            if($result == true && $count == 1){
+                $_SESSION['admin'] = "admin";
+            }
+            else
+                $_SESSION['admin'] = "customer";
+
             header("Location: home.php"); 
         }
         else{

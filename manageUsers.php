@@ -17,11 +17,11 @@
 
         $query = "SELECT * FROM user as U, customer as C WHERE (U.user_id <> '".$_SESSION['sid']."' AND C.user_id = U.user_id) AND ( ( ";
         if($name == "") $query = $query . "NULL"; else $query = $query . "'$name'"; 
-        $query = $query . " IS NULL) OR (user_name = '$name') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (user_name LIKE '%$name%') ) AND ( ( ";
         if($surname == "") $query = $query . "NULL"; else $query = $query . "'$surname'"; 
-        $query = $query . " IS NULL) OR (user_surname = '$surname') ) AND ( ( ";
+        $query = $query . " IS NULL) OR (user_surname LIKE '%$surname%') ) AND ( ( ";
         if($mail == "") $query = $query . "NULL"; else $query = $query . "'$mail'"; 
-        $query = $query . " IS NULL) OR (user_mail = '$mail') )";
+        $query = $query . " IS NULL) OR (user_mail LIKE '%$mail%') )";
         $result = mysqli_query($con, $query);
     }
     if(isset($_POST['home'])) {

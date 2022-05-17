@@ -184,17 +184,6 @@
             <div style="padding:0 10px;">
                 <h3 style="text-align: left;">Add film</h3>
                 <form method="post" class="example">
-<<<<<<< HEAD
-                    <input name="title" type="text" size="10" placeholder = "Title">
-                    <input name="director" type="numerical" size="10" placeholder = "Director">
-                    <input name="genre" type="numerical" size="5" placeholder = "Genre">
-                    <input name="year" type="numerical" size="2" placeholder = "Year">
-                    <input name="cost" type="numerical" size="1" placeholder = "Cost">
-                    <input name="series" type="text" size="10" placeholder = "Series">
-                    <input name="series" type="text" size="1" placeholder = "S-No"><br>
-                    <textarea wrap="off" cols="30" rows="5" name="comments" id="comments" placeholder="Description" style="width: 542px; resize: none;"></textarea><br>
-                    <button name="search" type="submit" style="width:  75px">Add</button>  
-=======
                     <input name="title" type="text" size="10" placeholder = "Title" required>
                     <input name="director" type="numerical" size="10" placeholder = "Director" required>
                     <input name="genre" type="numerical" size="5" placeholder = "Genre" required>
@@ -204,7 +193,6 @@
                     <input name="seriesno" type="text" size="1" placeholder = "S-No"><br>
                     <textarea wrap="off" cols="30" rows="5" name="description" id="description" placeholder="Description" style="width: 542px; resize: none;"></textarea><br>
                     <button name="addFilm" type="submit" style="width:  75px">Add</button>  
->>>>>>> main
                 </form>
                 <hr style="width: 500px; text-align:left; margin-left:0"> 
                 <h3 style="text-align: left;">Requests</h3>

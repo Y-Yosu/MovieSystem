@@ -6,7 +6,7 @@
     $result = $con->query($query);
     $row = $result->fetch_array(MYSQLI_NUM);
     $wallet = $row[6];
-    $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
+    $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id FROM film as F, rent as R WHERE R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id ORDER BY R.rent_date";
     $qres = mysqli_query($con,$query);
     //echo "Query: $query\n";
     
@@ -52,7 +52,7 @@
         
         $query = "SELECT F.f_title, F.f_director, F.f_year, F.f_rating, F.f_genre, R.rent_date, F.f_id ".
                         "FROM film as F, rent as R ".
-                        "WHERE R.rent_status = 'Ongoing' AND R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id AND ( ( ";
+                        "R.user_id = '" .$_SESSION['sid']. "' AND R.f_id = F.f_id AND ( ( ";
 
         if( $f_title == "" )
             $query = $query . "NULL";
@@ -237,15 +237,25 @@
                                     </tr> ";
                             if($qres == true){
                                 while( $row = mysqli_fetch_array($qres)){
-                                    echo "<tr>";
-                                    echo "<td>" . $row['f_title'] . "</td>";
-                                    echo "<td>" . $row['f_director'] . "</td>";
-                                    echo "<td>" . $row['f_genre'] . "</td>";
-                                    echo "<td>" . $row['f_year'] . "</td>";
-                                    echo "<td>" . $row['f_rating'] . "</td>";
-                                    echo "<td>" . $row['rent_date'] . "</td>";
-                                    echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
-                                    echo "</tr>";
+                                    
+                                    $target = date_create(date('Y-m-d'));
+                                    $origin = date_create($row['rent_date']);
+                                    $interval = date_diff($origin, $target);
+                                    $intervalint = $interval->format('%a');
+                                    //echo "DAYS------------------------- DAYS: $intervalint\n";
+                                    if( $intervalint > 30 )
+                                        continue;
+                                    else{
+                                        echo "<tr>";
+                                        echo "<td>" . $row['f_title'] . "</td>";
+                                        echo "<td>" . $row['f_director'] . "</td>";
+                                        echo "<td>" . $row['f_genre'] . "</td>";
+                                        echo "<td>" . $row['f_year'] . "</td>";
+                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                        echo "<td>" . $row['rent_date'] . "</td>";
+                                        echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
+                                        echo "</tr>";
+                                    }
                                 }
                                 echo "</table>";
                             }

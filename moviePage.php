@@ -53,7 +53,15 @@
     $row = $result->fetch_array(MYSQLI_NUM);
 
     if($row){
-        $rentStatus = $row[3];
+        $target = date_create(date('Y-m-d'));
+        $origin = date_create($row[2]);
+        $interval = date_diff($origin, $target);
+        $intervalint = $interval->format('%a');
+        //echo "DAYS------------------------- DAYS: $intervalint";
+        if( $intervalint > 30 )
+            $rentStatus = "Expired";
+        else
+            $rentStatus = "Ongoing";
     }
     
     $query = "select * from rate where f_id = '$movieId' AND user_id = '$sid';";

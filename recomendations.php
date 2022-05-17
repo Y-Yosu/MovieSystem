@@ -135,7 +135,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <p>Wallet: <?php echo $_SESSION['wallet'];?></p>
+            <p>Wallet: <?php echo "$".$_SESSION['wallet'];?></p>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>

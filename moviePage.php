@@ -141,19 +141,22 @@
             $result = $con->query($query);
             $row = $result->fetch_array(MYSQLI_NUM);
             debug_to_console($row);
-            $wallet = $row[6];
+            $_SESSION['wallet'] = $row[6];
             $cardid = $row[0];
             // debug_to_console(($wallet-$cost));
-            if( floatval($wallet) >= floatval($cost) ){
+            if( floatval($_SESSION['wallet']) >= floatval($cost) ){
                 if($rentStatus == "Expired"){
-                    $query = "update rent Set rent_date = now(), rent_status = 'Ongoing' where f_id = '$movieId' AND user_id = '$sid';";
+                    $date = new DateTime('today');
+                    $query = "update rent Set rent_date = '".$date->format("Y-m-d")."' where f_id = '$movieId' AND user_id = '$sid';";
                     $result = $con->query($query);
                 }
                 else{
-                    $query = "insert into rent Values($sid,'$movieId',now(),'Ongoing');";
+                    $date = new DateTime('today');
+                    $query = "insert into rent Values($sid,'$movieId', '".$date->format("Y-m-d")."','Ongoing');";
                     $result = $con->query($query);
                 }
-                $query = "update card Set balance = " . ($wallet-$cost) . " where card_id = '$cardid';";
+                $_SESSION['wallet'] = $_SESSION['wallet']-$cost;
+                $query = "update card Set balance = " . ($_SESSION['wallet']) . " where card_id = '$cardid';";
                 $result = $con->query($query);
                 header("Refresh:0");
             }
@@ -275,7 +278,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <div style="text-align:center;  margin-bottom: 18px;"><p>Wallet: <?php echo $wallet;?></p></div>
+            <div style="text-align:center;  margin-bottom: 18px;"><p>Wallet: <?php echo "$".$_SESSION['wallet'];?></p></div>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>

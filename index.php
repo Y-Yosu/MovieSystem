@@ -21,6 +21,11 @@
             $_SESSION['sid'] = $row[2];
             $_SESSION['mail'] = $mail;
 
+            $query2 = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
+            $result2 = $con->query($query2);
+            $row2 = $result2->fetch_array(MYSQLI_NUM);
+            $_SESSION['wallet'] = $row2[6];
+
             $query = "SELECT * FROM employee WHERE user_id = '".$_SESSION['sid']."'";
             $result = mysqli_query($con, $query);
 

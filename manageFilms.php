@@ -7,11 +7,6 @@
     }
     
     $error = "";
-    
-    $query = "select * from user natural join has natural join card where user_id = ".$_SESSION['sid'];
-    $result = $con->query($query);
-    $row = $result->fetch_array(MYSQLI_NUM);
-    $wallet = $row[6];
 
     $query = "SELECT U.user_name, U.user_surname, A.af_title, A.af_director, A.af_genre, A.af_year, R.request_desc, A.af_id FROM user as U, absent_film as A, request as R WHERE A.af_id = R.af_id AND R.user_id = U.user_id";
     $qres = mysqli_query($con,$query);
@@ -178,7 +173,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <div style="text-align:center;  margin-bottom: 18px;"><p>Wallet: <?php echo $wallet;?></p></div>
+            <div style="text-align:center;  margin-bottom: 18px;"><p>Wallet: <?php echo "$".$_SESSION['wallet'];;?></p></div>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>

@@ -46,13 +46,50 @@
         header("Location: manageUsers.php");
     }
     if(isset($_POST['Delete'])) {
+
+        //'".$_POST['Delete']."'
+        $query2 = "DELETE FROM card WHERE card_id = ( SELECT card_id FROM has WHERE user_id = '".$_POST['Delete']."')";
+        $result2 = mysqli_query($con, $query2);
+
         $query2 = "DELETE FROM user WHERE user_id = '".$_POST['Delete']."'";
         $result2 = mysqli_query($con, $query2);
  
         header("Location: manageUsers.php");
     }
-    if(isset($_POST['add'])) {
+    if(isset($_POST['addUser'])) {
         #$_POST['email'], $_POST['name'], $_POST['surname'], $_POST['password']
+        $query2 = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'emre_aydogmus' AND TABLE_NAME = 'user'";
+        $qres2 = mysqli_query($con,$query2);
+        $row2 = mysqli_fetch_array($qres2);
+        $next_id = $row2['AUTO_INCREMENT'];
+
+        $query2 = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'emre_aydogmus' AND TABLE_NAME = 'card'";
+        $qres2 = mysqli_query($con,$query2);
+        $row2 = mysqli_fetch_array($qres2);
+        $next_cid = $row2['AUTO_INCREMENT'];
+        
+        $query2 = "INSERT INTO user ( user_name, user_surname, user_mail, user_password ) "
+        . "VALUES( '".$_POST['name']."', '".$_POST['surname']."', '".$_POST['email']."', '".$_POST['password']."' )";
+        $qres2 = mysqli_query($con,$query2);
+        
+        $date = new DateTime('today');
+        //echo "DATE: ".$date->format("Y-m-d");
+        $query2 = "INSERT INTO customer ( user_id, join_date ) "
+        . "VALUES( $next_id, '".$date->format("Y-m-d")."' )";
+        //echo "QRY: ".$query2;
+        
+        $qres2 = mysqli_query($con,$query2);
+
+        $query2 = "INSERT INTO card ( balance, card_info ) "
+        . "VALUES( 0, 'Card of ".$_POST['name']." ".$_POST['surname']." with id $nex_id' )";
+        $qres2 = mysqli_query($con,$query2);
+        
+        $query2 = "INSERT INTO has (user_id, card_id) "
+        . "VALUES( $next_id, $next_cid )";
+        $qres2 = mysqli_query($con,$query2);
+        
+        header("Location: manageUsers.php");
+        
     }
     if(isset($_POST['logout'])){
         if(session_destroy()){

@@ -62,7 +62,7 @@
             $qres2 = mysqli_query($con,$query2);
         }
 
-        //header("Location: manageFilms.php");
+        header("Location: manageFilms.php");
     }
     if(isset($_POST['deleteRequest'])) {
 

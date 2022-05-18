@@ -358,7 +358,7 @@ public class Main {
                     moth = 5;
                 }
                 addCustomer("" + i, day, month, 2022);
-                addCard("" + i, (float) Math.random() * 100, "Card of user with id: " + i);
+                addCard("" + i, (float) round((Math.random() * 100, 2), "Card of user with id: " + i);
                 addHas("" + i, "" + i);
             }
             for (int i = 6; i < 50; i++) {

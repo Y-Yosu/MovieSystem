@@ -156,7 +156,7 @@
             <div style="padding:0 10px;">
                 <h3 style="text-align: left;">Recomended Films from Friends:</h3>
                     <?php
-                        $query = "SELECT C1.f_id, C1.f_title, C1.f_director, C1.f_genre, C1.f_year, C1.f_rating, C1.f_price FROM film as C1, recommend as C2 WHERE C2.receiver_id = '".$_SESSION["sid"]."' AND C1.f_id = C2.f_id";
+                        $query = "SELECT C1.f_id, C1.f_title, C1.f_director, C1.f_genre, C1.f_year, C1.f_rating, C1.f_price, count(C1.f_id) as cnt FROM film as C1, recommend as C2 WHERE C2.receiver_id = '".$_SESSION["sid"]."' AND C1.f_id = C2.f_id GROUP BY C1.f_id";
                         
                         $result = mysqli_query($con, $query);
                         if($result == true) 
@@ -171,9 +171,10 @@
                                         <th>Year</th>
                                         <th>Rate</th>
                                         <th>Cost</th>
+                                        <th>Number of Recomenders</th>
                                     </tr> ";
                             while($row = mysqli_fetch_array($result)) {
-                                        echo "<tr><td>" . $row['f_title'] . "</td><td>" . $row['f_director'] . "</td><td>" . $row['f_genre'] . "</td><td>" . $row['f_year'] . "</td><td>" . $row['f_rating'] . "</td><td>" . $row['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                                        echo "<tr><td>" . $row['f_title'] . "</td><td>" . $row['f_director'] . "</td><td>" . $row['f_genre'] . "</td><td>" . $row['f_year'] . "</td><td>" . $row['f_rating'] . "</td><td>" . $row['f_price'] . "$</td><td>" . $row['cnt'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
                             }        
                             
                             echo "</table>";

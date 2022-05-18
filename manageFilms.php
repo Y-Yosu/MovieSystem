@@ -230,7 +230,7 @@
                                         */
                                     
                                 }
-                                echo "</table>";
+                                echo "</table><br><br>";
                             }
 
                         }

@@ -297,12 +297,12 @@
                                     if( is_null( $row['f_rating'] ) )
                                         echo "<td>" . "-" . "</td>";
                                     else
-                                        echo "<td>" . $row['f_rating'] . "</td>";
+                                        echo "<td>" . number_format($row['f_rating'], 2) . "</td>";
                                     echo "<td>" . $row['f_price'] . "$</td>";
                                     echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
                                     echo "</tr>";
                                 }
-                                echo "</table>";
+                                echo "</table><br><br>";
                             }
                         }
                         else {

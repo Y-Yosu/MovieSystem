@@ -176,7 +176,7 @@
                                         <th>Cost</th>
                                     </tr> ";
                             while($row2 = mysqli_fetch_array($result2)) {
-                                        echo "<tr><td>" . $row2['f_title'] . "</td><td>" . $row2['f_director'] . "</td><td>" . $row2['f_genre'] . "</td><td>" . $row2['f_year'] . "</td><td>" . $row2['f_rating'] . "</td><td>" . $row2['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row2['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                                        echo "<tr><td>" . $row2['f_title'] . "</td><td>" . $row2['f_director'] . "</td><td>" . $row2['f_genre'] . "</td><td>" . $row2['f_year'] . "</td><td>" . number_format($row2['f_rating'],2) . "</td><td>" . $row2['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row2['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
                             }        
                             echo "</table><br><br>";
                         }

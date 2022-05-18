@@ -163,6 +163,9 @@
                 $result = $con->query($query);
                 header("Refresh:0");
             }
+            else{
+                $error="Insufficent wallet";
+            }
         }
     }
     if(isset($_POST['logout'])){
@@ -303,6 +306,7 @@
                 <b style="margin-left: 15px">Genre: </b><p><?php echo $genre; ?></p>
                 <b style="margin-left: 15px">Year: </b><p> <?php echo $year; ?></p>
                 <b style="margin-left: 15px">Rate: </b><p> <?php echo $rate; ?></p></div><br>
+                <?php if($error != "") echo "<p class=\"error\" style=\"color: red;\" >".$error."</p><br>";?>
                 <b>Description: </b><p> <?php echo $description; ?></p>
                 <?php
                     if($isSeries){

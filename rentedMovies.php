@@ -37,6 +37,9 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['statistics'])) {
+        header("Location: statistics.php");
+    }
     if(isset($_POST['moviePage'])) {
         $_SESSION['goToMovie'] = $_POST['moviePage'];
         header("Location: moviePage.php");
@@ -212,7 +215,8 @@
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
-                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>
+                <button type=\"submit\" name=\"statistics\" id=\"statistics\">Statisttics</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>

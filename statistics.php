@@ -2,15 +2,32 @@
     require_once 'connect.php';
     session_start();
     
+    $query1 = "SELECT sum(F.f_price) as weeklyrevenue FROM film as F, rent as R WHERE DATEDIFF( NOW(), R.rent_date ) <= 7 AND F.f_id = R.f_id";
+    $result1 = mysqli_query($con, $query1);
+    $row1 = mysqli_fetch_array($result1);
+    $q1 = number_format($row1[0], 2);
+
+    $query2 = "SELECT sum(F.f_price) as monthlyrevenue FROM film as F, rent as R  WHERE DATEDIFF( NOW(), R.rent_date ) <= 30 AND F.f_id = R.f_id";
+    $result2 = mysqli_query($con, $query2);
+    $row2 = mysqli_fetch_array($result2);
+    $q2 = number_format($row2[0], 2);
+
+    $query3 = "SELECT count(*) as totalNewCustomersWeekly FROM customer WHERE DATEDIFF( NOW(), join_date ) <= 7";
+    $result3 = mysqli_query($con, $query3);
+    $row3 = mysqli_fetch_array($result3);
+    $q3 = $row3[0];
+
+    $query4 = "SELECT count(*) as totalNewCustomersMonthly FROM customer WHERE DATEDIFF( NOW(), join_date ) <= 30";
+    $result4 = mysqli_query($con, $query4);
+    $row4 = mysqli_fetch_array($result4);
+    $q4 = $row4[0];
+
+    $query5 = "SELECT R.rent_date, sum(F.f_price) as monthlyrevenue FROM film as F, rent as R WHERE F.f_id = R.f_id GROUP BY R.rent_date ORDER BY R.rent_date LIMIT 50";
+    $result5 = mysqli_query($con, $query5);
+    
     if(is_null($_SESSION['sname'])) {
         header("Location: notlogedin.php");
     }
-
-    $error = "";
-
-    $query = "SELECT user_name, user_surname FROM user WHERE user_id = '".$_SESSION["recomender_id"]."'";
-    $result = mysqli_query($con, $query);
-    $row = mysqli_fetch_array($result);
 
     if(isset($_POST['home'])) {
         header("Location: home.php");
@@ -36,10 +53,6 @@
     if(isset($_POST['statistics'])) {
         header("Location: statistics.php");
     }
-    if(isset($_POST['moviePage'])) {
-        $_SESSION['goToMovie'] = $_POST['moviePage']; 
-        header("Location: moviePage.php");
-    }
     if(isset($_POST['logout'])){
         if(session_destroy()){
             header("location: index.php");
@@ -51,8 +64,8 @@
 <html>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <head>
-    <style>
-        
+    <style>  
+    <?php include 'stars.css'; ?>
     h1,h2,h3{text-align: center; 
         line-height:1.2;}
     body {background-color: rgb(245, 233, 218);
@@ -74,7 +87,7 @@
         background-color: #daf5e9;
         }
         /* Control the right side */
-    .right {
+        .right {
         height: 100%;
         width: 75%;
         position: fixed;
@@ -83,8 +96,8 @@
         overflow-x: hidden;
         padding-top: 40px;
         right: 0;
-        }      
-    p {text-align: center;}
+        }   
+    b, p {display: inline;}
     .applyButton  {border: none;
                    cursor: pointer;
                    background-color: rgb(245, 233, 218);
@@ -96,9 +109,12 @@
                    text-align: center;
                    cursor: pointer;
                    background-color: rgb(245, 233, 218);
-                   color: blue;
-                   text-decoration-line: underline;}
-    table {border-collapse: collapse;}
+                   color: red;
+                   text-decoration-line: underline;
+                   font-size : 16px;}
+    table {border-collapse: collapse;
+        margin-left: auto;
+         margin-right: auto;}
     th, td {width:150px;
             text-align:center;
             padding:5px }
@@ -142,7 +158,7 @@
     <body>
         <div class="left">
             <h2><?php echo $_SESSION['sname'] . " " . $_SESSION['surname']; ?></h2>
-            <p>Wallet: <?php echo "$".$_SESSION['wallet'];?></p>
+            <div style="text-align:center;  margin-bottom: 18px;"><p>Wallet: <?php echo "$".$_SESSION['wallet'];?></p></div>
             <form method="post">
             <div class="btn-group">
                 <button type="submit" name="home" id="home">Home Page</button>
@@ -158,32 +174,37 @@
 
         <div class="right" >
             <div style="padding:0 10px;">
-                <?php echo "<h3 style=\"text-align: left;\">Recomended Films by ".$row[0]." " .$row[1].":</h3>"; ?>
-                    <?php
-                        $query2 = "SELECT C1.f_id, C1.f_title, C1.f_director, C1.f_genre, C1.f_year, C1.f_rating, C1.f_price FROM film as C1, recommend as C2 WHERE C2.recommender_id = '".$_SESSION["recomender_id"]."' AND C2.receiver_id = '".$_SESSION["sid"]."' AND C1.f_id = C2.f_id";
-                        $result2 = mysqli_query($con, $query2);
-                        if($result2 == true) 
-                            $count2 = mysqli_num_rows($result2);    
-                        if($result2 == true && $count2 != 0) {
-                            echo "
-                                <table>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Director</th>
-                                        <th>Genre</th>
-                                        <th>Year</th>
-                                        <th>Rate</th>
-                                        <th>Cost</th>
-                                    </tr> ";
-                            while($row2 = mysqli_fetch_array($result2)) {
-                                        echo "<tr><td>" . $row2['f_title'] . "</td><td>" . $row2['f_director'] . "</td><td>" . $row2['f_genre'] . "</td><td>" . $row2['f_year'] . "</td><td>" . $row2['f_rating'] . "</td><td>" . $row2['f_price'] ."$</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row2['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
-                            }        
-                            echo "</table><br><br>";
+                <h2 style="text-align: center;">Statistics</h2>
+                
+                <h3>Weekly Revenue</h3>  
+                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo "$".$q1; ?></p></div>
+                <hr style="width: 600px; margin:auto;margin-top: 20px;"> 
+                <h3>Monthly Revenue</h3>  
+                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo "$".$q2; ?></p></div>
+                <hr style="width: 600px; margin:auto; margin-top: 20px;">
+                <h3>Weekly New Customers</h3>  
+                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo $q3." new customer"; ?></p></div>
+                <hr style="width: 600px; margin:auto;margin-top: 20px;">
+                <h3>Monthly New Customers</h3>  
+                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo $q4." new customer people"; ?></p></div>
+                <hr style="width: 600px; margin:auto;margin-top: 20px;">
+                <?php
+                    echo "<h3 style=\"text-align: center;\">Daily Revenue</h3>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Revenue</th>
+                        </tr> ";
+                    if($result5 == true){
+                        while( $row5 = mysqli_fetch_array($result5)){
+                            echo "<tr>";
+                            echo "<td>" . $row5['rent_date'] . "</td>";
+                            echo "<td style=\"color: green;\">" . "$".number_format($row5['monthlyrevenue'], 2) . "</td>";
+                            echo "</tr>";
                         }
-                        else {
-                            echo "<p style=\"text-align: left; color: red;\">No recomendations from ".$row[0]." ".$row[1]."</p>";
-                        }
-                    ?>
+                    }
+                    echo "</table><br><br>";
+                    ?>                
             </div>
         </div>
 

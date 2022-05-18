@@ -46,6 +46,9 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['statistics'])) {
+        header("Location: statistics.php");
+    }
     if(isset($_POST['SendRequest'])) {
         $query2 = "INSERT INTO add_friend (adder_id, added_id, request_status) VALUES ('".$_SESSION["sid"]."', '".$_POST['SendRequest']."', 'Pending' )";
         $result2 = mysqli_query($con, $query2);
@@ -165,7 +168,8 @@
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
-                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>
+                <button type=\"submit\" name=\"statistics\" id=\"statistics\">Statisttics</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
@@ -193,7 +197,7 @@
                             while($row = mysqli_fetch_array($result)) {
                                 echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname'] . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"SendRequest\" class=\"rentButton\">Send Request</button></form></td></tr>";
                             }        
-                            echo "</table>";
+                            echo "</table><br><br>";
                         }
                         else
                             echo "<p style=\"text-align: left; color: red;\">No such user exsists...</p>";

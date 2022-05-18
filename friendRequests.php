@@ -46,6 +46,9 @@
     if(isset($_POST['manageUsers'])) {
         header("Location: manageUsers.php");
     }
+    if(isset($_POST['statistics'])) {
+        header("Location: statistics.php");
+    }
     if(isset($_POST['Accept'])) {
         $query2 = "UPDATE add_friend, user SET add_friend.request_status = 'Accepted' WHERE add_friend.added_id = '".$_SESSION["sid"]."' AND add_friend.adder_id = '".$_POST['Accept']."'";
         $result2 = mysqli_query($con, $query2);
@@ -174,7 +177,8 @@
                 <button type="submit" name="rentHistory" id="rentHistory">Rent History</button>
                 <button type="submit" name="friends" id="friends">Friends</button>
                 <?php if($_SESSION['admin'] == "admin") echo "<button type=\"submit\" name=\"manageFilms\" id=\"manageFilms\">Manage Films</button>
-                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>";?>
+                <button type=\"submit\" name=\"manageUsers\" id=\"manageUsers\">Manage Users</button>
+                <button type=\"submit\" name=\"statistics\" id=\"statistics\">Statisttics</button>";?>
                 <button type="submit" name="logout" id="logout" style="color: red">Log Out</button>
             </div></form>
         </div>
@@ -200,7 +204,7 @@
                             while($row = mysqli_fetch_array($result)) {
                                 echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname']  . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Accept\" class=\"rentButton\">Accept Request</button></form></td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Decline\" class=\"rentButton\" style=\"color: red;\">Decline Request</button></form></td></tr>";
                             }        
-                            echo "</table>";        
+                            echo "</table><br><br>";        
                         }
                         else if ($error == "notFound") {
                             echo "<p style=\"text-align: left; color: red;\">No such user exsists...</p>";

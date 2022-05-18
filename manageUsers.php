@@ -243,7 +243,7 @@
                             while($row = mysqli_fetch_array($result)) {
                                 echo "<tr><td>" . $row['user_name'] . "</td><td>" . $row['user_surname'] . "</td><td>" . $row['user_mail'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['user_id']." name=\"Delete\" class=\"rentButton\">Delete User</button></form></td></tr>";
                             }        
-                            echo "</table>";
+                            echo "</table><br><br>";
                         }
                         else {
                             echo "<p style=\"text-align: left; color: red;\">No such user exsists...</p>";

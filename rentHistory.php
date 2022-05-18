@@ -254,12 +254,12 @@
                                             echo "<td>" . $row['f_director'] . "</td>";
                                             echo "<td>" . $row['f_genre'] . "</td>";
                                             echo "<td>" . $row['f_year'] . "</td>";
-                                            echo "<td>" . $row['f_rating'] . "</td>";
+                                            echo "<td>" . number_format($row['f_rating'],2) . "</td>";
                                             echo "<td>" . $row['rent_date'] . "</td>";
                                             echo "<td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" name=\"moviePage\" class=\"rentButton\" value =". $row['f_id'].">Movie Page</button></form></td>";
                                             echo "</tr>";
                                         }
-                                        echo "</table>";
+                                        echo "</table><br><br>";
                                     }
                         }
                         else if($error == "No results from query"){

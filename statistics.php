@@ -22,7 +22,7 @@
     $row4 = mysqli_fetch_array($result4);
     $q4 = $row4[0];
 
-    $query5 = "SELECT R.rent_date, sum(F.f_price) as monthlyrevenue FROM film as F, rent as R WHERE F.f_id = R.f_id GROUP BY R.rent_date ORDER BY R.rent_date LIMIT 50";
+    $query5 = "SELECT R.rent_date, sum(F.f_price) as monthlyrevenue FROM film as F, rent as R WHERE F.f_id = R.f_id GROUP BY R.rent_date ORDER BY R.rent_date DESC LIMIT 50";
     $result5 = mysqli_query($con, $query5);
     
     if(is_null($_SESSION['sname'])) {
@@ -186,7 +186,7 @@
                 <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo $q3." new customer"; ?></p></div>
                 <hr style="width: 600px; margin:auto;margin-top: 20px;">
                 <h3>Monthly New Customers</h3>  
-                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo $q4." new customer people"; ?></p></div>
+                <div style="text-align: center;"><p style="color: green; text-align: center;" ><?php echo $q4." new customer"; ?></p></div>
                 <hr style="width: 600px; margin:auto;margin-top: 20px;">
                 <?php
                     echo "<h3 style=\"text-align: center;\">Daily Revenue</h3>

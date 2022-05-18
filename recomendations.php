@@ -174,7 +174,7 @@
                                         <th>Number of Recomenders</th>
                                     </tr> ";
                             while($row = mysqli_fetch_array($result)) {
-                                        echo "<tr><td>" . $row['f_title'] . "</td><td>" . $row['f_director'] . "</td><td>" . $row['f_genre'] . "</td><td>" . $row['f_year'] . "</td><td>" . $row['f_rating'] . "</td><td>" . $row['f_price'] . "$</td><td>" . $row['cnt'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
+                                        echo "<tr><td>" . $row['f_title'] . "</td><td>" . $row['f_director'] . "</td><td>" . $row['f_genre'] . "</td><td>" . $row['f_year'] . "</td><td>" . number_format($row['f_rating'],2) . "</td><td>" . $row['f_price'] . "$</td><td>" . $row['cnt'] . "</td><td style=\"text-align:left;\"><form method=\"post\"><button type=\"submit\" value=".$row['f_id']." name=\"moviePage\" class=\"rentButton\">Movie Page</button></form></td></tr>";
                             }        
                             
                             echo "</table>";
